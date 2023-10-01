@@ -2,31 +2,21 @@
 	<div class="container mx-auto flex gap-10">
 		<div class="flex-grow flex flex-col gap-3">
 			<div class="flex justify-between items-center">
-				<p class="text-blue-800 text-3xl">Hola, John Doe</p>
-				<p class="text-gray-400">Nº de Afiliado <span class="font-bold">867623456</span></p>
+				<p class="text-blue-800 text-3xl">Hola, {{credenciales.nombre}} {{ credenciales.apellido }} </p> 
+				<p class="text-gray-400">Nº de Afiliado <span class="font-bold">{{ credenciales.nroAfiliado }}</span></p>
 			</div>
 			<p class="text-lg font-bold">Su plan actual</p>
 			<div class="flex items-center gap-3 px-3 py-2">
-				<p class="flex-grow">John Doe</p>
-				<p class="font-semibold">Gold</p>
-				<p class="text-gray-400">Venc. 20/10/23</p>
+				<p class="flex-grow">{{credenciales.nombre}} {{ credenciales.apellido }}</p>
+				<p class="font-semibold">{{ credenciales.plan.nombre }}</p>
+				<p class="text-gray-400">Venc. {{ credenciales.plan.vencimiento }}</p>
 			</div>
 			<p class="text-lg font-bold">Planes actuales de sus co-titulares</p>
 			<div class="flex flex-col divide-y">
-				<div class="flex items-center gap-3 px-3 py-2">
-					<p class="flex-grow">Jane Doe <span class="text-gray-400">cónyuge</span></p>
-					<p class="font-semibold">Silver</p>
-				<p class="text-gray-400">Venc. 20/10/23</p>
-				</div>
-				<div class="flex items-center gap-3 px-3 py-2">
-					<p class="flex-grow">Joanne Doe <span class="text-gray-400">hijo/a</span></p>
-					<p class="font-semibold">Silver</p>
-				<p class="text-gray-400">Venc. 20/10/23</p>
-				</div>
-				<div class="flex items-center gap-3 px-3 py-2">
-					<p class="flex-grow">Joe Doe <span class="text-gray-400">hijo/a</span></p>
-					<p class="font-semibold">Copper</p>
-				<p class="text-gray-400">Venc. 16/10/24</p>
+				<div class="flex items-center gap-3 px-3 py-2" v-for="cotitular in credenciales.coTitulares">
+					<p class="flex-grow">{{ cotitular.nombre }} <span class="text-gray-400">{{ cotitular.relacion }}</span></p>
+					<p class="font-semibold">{{ cotitular.plan.nombre }}</p>
+					<p class="text-gray-400">{{ cotitular.plan.vencimiento }}</p>
 				</div>
 			</div>
 		</div>
@@ -56,5 +46,7 @@
 </template>
 
 <script setup>
-
+  import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { credenciales } from '@/router/index.js';
 </script>

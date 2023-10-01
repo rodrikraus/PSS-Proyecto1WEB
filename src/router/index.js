@@ -55,6 +55,7 @@ const router = createRouter({
     ]
 })
 
+export const credenciales = ref('');
 // Agrega un guardia de navegación global para verificar isLoggedIn
 export const isLoggedIn = ref(false);
 router.beforeEach((to, from, next) => {

@@ -25,15 +25,14 @@
   import { ref } from 'vue';
   import { supabase } from '../supabase.js';
   import { useRouter } from 'vue-router'; // Import useRouter
-  import { isLoggedIn } from '../router/index.js'; // Import isLoggedIn from the global state
+  import { credenciales,isLoggedIn } from '../router/index.js'; // Import isLoggedIn from the global state
 
 
 
   const email = ref('');
   const password = ref('');
   const authMessage = ref('');
-  
-  const router = useRouter(); // Get the router instance
+  const router = useRouter(); // Get the router instance-
 
   const login = async () => {
 	const { data: userData, error: authError } = await supabase
@@ -41,13 +40,51 @@
 	  .select('*')
 	  .eq('email', email.value)
 	  .eq('contraseña', password.value);
-  
 	if (authError) {
 	  authMessage.value = 'Error al iniciar sesión';
 	} else if (userData.length > 0) {
 	  authMessage.value = 'Inicio de sesión correcto';
 	  //Se setea la variable isLoggedIn en true y se redirige al home
 	  isLoggedIn.value = true;
+	  //credenciales.value = userData[0];
+	  credenciales.value = {
+		"nombre":userData[0].nombres,
+		"apellido":"Doe",
+		"nroAfiliado":"867623456",
+		"plan":{
+			"nombre":"Gold",
+			"vencimiento":"20/10/23"
+		},
+		"coTitulares": [
+			{
+				"nombre":"Jane",
+				"apellido":"Doe",
+				"relacion":"conyuge",
+				"plan":{
+					"nombre":"Silver",
+					"vencimiento":"20/10/23"
+				},
+			},
+			{
+				"nombre":"Joanne",
+				"apellido":"Doe",
+				"relacion":"hijo/a",
+				"plan":{
+					"nombre":"Copper",
+					"vencimiento":"20/10/23"
+				},
+			},
+			{
+				"nombre":"Joe",
+				"apellido":"Doe",
+				"relacion":"hijo/a",
+				"plan":{
+					"nombre":"Copper",
+					"vencimiento":"16/10/24"
+				},
+			}
+		]
+	  }
 	  router.push('/');
 	} else {
 	  authMessage.value = 'Credenciales incorrectas';
