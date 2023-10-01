@@ -60,7 +60,7 @@ export const credenciales = ref('');
 export const isLoggedIn = ref(false);
 router.beforeEach((to, from, next) => {
   
-    if (to.name !== 'login' &&  to.name !== 'signup' && !isLoggedIn.value) { //(se usa value porque es una variable global)
+    if (to.name !== 'login' &&  to.name !== 'signup' &&  to.name !== 'password.recover' && !isLoggedIn.value) { //(se usa value porque es una variable global)
       // Si no estás en la página de inicio de sesión y no estás autenticado, redirige a la página de inicio de sesión
       next({ name: 'login' });
     } else {
