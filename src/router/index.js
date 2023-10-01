@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import { ref } from 'vue';
 import LogInView from '../views/LogInView.vue'
 import SignUpView from '../views/SignUpView.vue'
 import PlanIndexView from '../views/plans/PlanIndexView.vue'
@@ -53,5 +54,18 @@ const router = createRouter({
         },
     ]
 })
+
+// Agrega un guardia de navegación global para verificar isLoggedIn
+export const isLoggedIn = ref(false);
+router.beforeEach((to, from, next) => {
+  
+    if (to.name !== 'login' && !isLoggedIn.value) { //(se usa value porque es una variable global)
+      // Si no estás en la página de inicio de sesión y no estás autenticado, redirige a la página de inicio de sesión
+      next({ name: 'login' });
+    } else {
+      // Si estás autenticado o en la página de inicio de sesión, permite la navegación
+      next();
+    }
+  });
 
 export default router
