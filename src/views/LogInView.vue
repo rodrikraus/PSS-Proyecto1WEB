@@ -36,56 +36,64 @@
 
   const login = async () => {
 	const { data: userData, error: authError } = await supabase
-	  .from('clientes')
+	  .from('clientes')//usuarios
 	  .select('*')
 	  .eq('email', email.value)
 	  .eq('contraseña', password.value);
 	if (authError) {
 	  authMessage.value = 'Error al iniciar sesión';
 	} else if (userData.length > 0) {
-	  authMessage.value = 'Inicio de sesión correcto';
-	  //Se setea la variable isLoggedIn en true y se redirige al home
-	  isLoggedIn.value = true;
-	  //credenciales.value = userData[0];
-	  credenciales.value = {
-		"nombre":userData[0].nombres,
-		"apellido":"Doe",
-		"nroAfiliado":"867623456",
-		"plan":{
-			"nombre":"Gold",
-			"vencimiento":"20/10/23"
-		},
-		"coTitulares": [
-			{
-				"nombre":"Jane",
-				"apellido":"Doe",
-				"relacion":"conyuge",
-				"plan":{
-					"nombre":"Silver",
-					"vencimiento":"20/10/23"
-				},
+		authMessage.value = 'Inicio de sesión correcto';
+	  	//Se setea la variable isLoggedIn en true y se redirige al home
+	  	isLoggedIn.value = true;
+		//credenciales.value = userData[0];
+		credenciales.value = {
+			"nombre":userData[0].nombres,
+			"apellido":"Doe",
+			"nroAfiliado":"867623456",
+			"rol":"empleado", //cliente, empleado, admin
+			"plan":{
+				"nombre":"Gold",
+				"vencimiento":"20/10/23"
 			},
-			{
-				"nombre":"Joanne",
-				"apellido":"Doe",
-				"relacion":"hijo/a",
-				"plan":{
-					"nombre":"Copper",
-					"vencimiento":"20/10/23"
+			"coTitulares": [
+				{
+					"nombre":"Jane",
+					"apellido":"Doe",
+					"relacion":"conyuge",
+					"plan":{
+						"nombre":"Silver",
+						"vencimiento":"20/10/23"
+					},
 				},
-			},
-			{
-				"nombre":"Joe",
-				"apellido":"Doe",
-				"relacion":"hijo/a",
-				"plan":{
-					"nombre":"Copper",
-					"vencimiento":"16/10/24"
+				{
+					"nombre":"Joanne",
+					"apellido":"Doe",
+					"relacion":"hijo/a",
+					"plan":{
+						"nombre":"Copper",
+						"vencimiento":"20/10/23"
+					},
 				},
-			}
-		]
-	  }
-	  router.push('/');
+				{
+					"nombre":"Joe",
+					"apellido":"Doe",
+					"relacion":"hijo/a",
+					"plan":{
+						"nombre":"Copper",
+						"vencimiento":"16/10/24"
+					},
+				}
+			]
+		}
+		if(credenciales.value.rol=="cliente")
+			router.push('/client');
+		else if(credenciales.value.rol=="empleado")
+			router.push('/employee');
+		else if(credenciales.value.rol=="admin")
+			router.push('/plans');
+		else
+			router.push('/');
 	} else {
 	  authMessage.value = 'Credenciales incorrectas';
 	}

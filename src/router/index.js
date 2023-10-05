@@ -3,11 +3,14 @@ import { ref } from 'vue';
 import LogInView from '../views/LogInView.vue'
 import SignUpView from '../views/SignUpView.vue'
 import PlanIndexView from '../views/plans/PlanIndexView.vue'
+import PlanInfoView from '../views/plans/PlanInfoView.vue'
+import EmpleadosIndexView from '../views/empleados/EmpleadosIndexView.vue'
 import ClientHomeView from '../views/home/ClientHomeView.vue'
 import ChangePasswordView from '../views/ChangePasswordView.vue'
 import EmployeeHomeView from '../views/home/EmployeeHomeView.vue'
 import RecoverPasswordView from '../views/RecoverPasswordView.vue'
-import ProfileIndexView from '@/views/profile/ProfileIndexView.vue'
+import ProfileIndexView from '../views/profile/ProfileIndexView.vue'
+import HomeDefaultView from '../views/home/HomeDefaultView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,6 +18,11 @@ const router = createRouter({
         {
             path: '/',
             name: 'home',
+            component: HomeDefaultView
+        },
+        {
+            path: '/client',
+            name: 'client',
             component: ClientHomeView
         },
         {
@@ -36,6 +44,16 @@ const router = createRouter({
             path: '/plans',
             name: 'plans',
             component: PlanIndexView
+        },
+        {
+            path: '/plansInfo',
+            name: 'plansInfo',
+            component: PlanInfoView
+        },
+        {
+            path: '/empleados',
+            name: 'empleados',
+            component: EmpleadosIndexView
         },
         {
             path: '/profile',

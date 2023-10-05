@@ -2,8 +2,8 @@
 	<div class="container mx-auto flex gap-10">
 		<div class="flex-grow flex flex-col gap-3">
 			<div class="flex justify-between items-center">
-				<p class="text-blue-800 text-3xl">Hola, Empleado</p>
-				<p class="text-gray-400">Nº de Legajo <span class="font-bold">867623456</span></p>
+				<p class="text-blue-800 text-3xl">Hola, {{ credenciales.nombre }}</p>
+				<p class="text-gray-400">Nº de Legajo <span class="font-bold">{{ credenciales.nroAfiliado }}</span></p>
 			</div>
 			<div class="flex gap-10">
 				<div class="flex-grow flex flex-col gap-3">
@@ -46,10 +46,15 @@
 				<div class="flex flex-col gap-1">
 					<label for="search">Buscar cliente</label>
 					<div class="flex gap-4">
-						<input type="text" id="search" class="input-text">
-						<button class="btn border-blue-700 text-blue-700">
+						<input v-model="search" type="text" id="search" class="input-text">
+						<button @click="buscar" class="btn border-blue-700 text-blue-700">
 							<i class="fa-solid fa-search"></i>
 						</button>
+					</div>
+					<div v-if="cliente" class="flex items-center gap-3 px-3 py-2">
+						<p class="flex font-bold">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
+						<p class="text-sm text-gray-400">{{ credenciales.plan.nombre }}</p>
+						<button type="button" class="btn border-blue-700 text-blue-700">Ver</button>
 					</div>
 				</div>
 				<div class="flex flex-col divide-y">
@@ -86,5 +91,22 @@
 </template>
 
 <script setup>
+import { credenciales } from '../../router';
+import { supabase } from '../../supabase.js';
+import { ref } from 'vue';
+
+const search = ref(''); //texto ingresado a buscar como nombre de cliente
+const cliente = ref('');
+
+const buscar = async () => {
+	const { data: userData, error: searchError } = await supabase
+		.from('clientes')
+		.select('*')
+		.eq('nombres', search.value);
+	if(!searchError && userData.length > 0){
+		cliente.value = userData[0];
+	}
+	else cliente.value = null;
+};
 
 </script>
