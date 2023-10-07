@@ -51,14 +51,14 @@
 		//credenciales.value = userData[0];
 		credenciales.value = {
 			"nombre":userData[0].nombres,
-			"apellido":"Doe",
-			"nroAfiliado":"867623456",
-			"rol":"empleado", //cliente, empleado, admin
+			"apellido":userData[0].apellidos,
+			"nroAfiliado":userData[0].nro_afiliado,
+			"rol":"cliente", //cliente, empleado, admin
 			"plan":{
-				"nombre":"Gold",
+				"nombre":userData[0].nombre_plan,
 				"vencimiento":"20/10/23"
 			},
-			"coTitulares": [
+			"coTitulares": [		//Ver como obtener todos los cotitulares
 				{
 					"nombre":"Jane",
 					"apellido":"Doe",
@@ -88,7 +88,7 @@
 				}
 			]
 		}
-		if(credenciales.value.rol=="cliente")
+		if(credenciales.value.rol=="cliente")	//Hacer varios pedidos
 			router.push('/client');
 		else if(credenciales.value.rol=="empleado")
 			router.push('/employee');

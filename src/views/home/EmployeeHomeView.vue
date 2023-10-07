@@ -53,7 +53,7 @@
 					</div>
 					<div v-if="cliente" class="flex items-center gap-3 px-3 py-2">
 						<p class="flex font-bold">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
-						<p class="text-sm text-gray-400">{{ credenciales.plan.nombre }}</p>
+						<p class="text-sm text-gray-400">{{ cliente.nombre_plan}}</p>
 						<button type="button" class="btn border-blue-700 text-blue-700">Ver</button>
 					</div>
 				</div>
