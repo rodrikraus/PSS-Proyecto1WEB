@@ -39,8 +39,10 @@
 	  .from('clientes')//usuarios
 	  .select('*')
 	  .eq('email', email.value)
-	  .eq('contraseña', password.value);
+	  .eq('contrasena', password.value);
 	if (authError) {
+		console.log(email.value)
+		console.log(password.value)
 	  authMessage.value = 'Error al iniciar sesión';
 	} else if (userData.length > 0) {
 		authMessage.value = 'Inicio de sesión correcto';
