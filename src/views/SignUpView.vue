@@ -134,7 +134,7 @@
 		password: '',
 		password_confirmation: '',
 	};
-	const planSeleccionado = ref('Silver'); // Initialize it as an empty string
+	const planSeleccionado = ref('Silver'); // Initialize it as Silver plan
 
 	async function enviarFormulario() {	
 		if(formData.password != formData.password_confirmation) {
@@ -145,7 +145,7 @@
 		}
 		
 		try {
-			// Miro si existe el plan y obtengo el id
+			// Miro si existe el plan
 			const { data: planesData, error: planesError } = await supabase
 				.from('planes')
 				.select('nombre')
@@ -155,6 +155,17 @@
 				alert('El plan seleccionado no existe.');
 				return;
 			} else {
+				//Verifico que no exista otro cliente con el mismo mail
+				const { data: dataCorreo, error: correoError } = await supabase
+				.from('clientes')
+				.select('email')
+				.eq('email', formData.correo);
+
+			if (!correoError || dataCorreo || dataCorreo.length > 0) {
+				alert('El correo introducido ya pertenece a otro usuario registrado.');
+				return;
+			}
+
 				// Prepare the data to be inserted
 				const clientData = {
 					nombres: formData.nombres,
