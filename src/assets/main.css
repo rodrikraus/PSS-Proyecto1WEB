@@ -17,3 +17,21 @@ textarea {
 .btn {
 	@apply px-3 py-1 rounded border
 }
+
+.alert-success{
+	background-color: #4CAF50;
+	color: white;
+	padding: 15px;
+	margin: 10px 0;
+	border-radius: 5px;
+	text-align: center;
+}
+
+.alert-error{
+	background-color: #b82e24;
+	color: white;
+	padding: 15px;
+	margin: 10px 0;
+	border-radius: 5px;
+	text-align: center;
+}
