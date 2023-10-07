@@ -51,7 +51,7 @@
 					<div class="flex flex-col gap-1">
 						<label>Elegir Plan</label>
 						<div class="flex flex-col gap-4">
-							<div @click="planSeleccionado = 'Gold'" class="flex flex-col items-center gap-3 rounded-lg bg-white p-4 cursor-pointer hover:bg-gray-50 border-2 border-transparent hover:border-blue-300">
+							<div @click="selectPlan('Gold')" :class="{ 'selected-plan': selectedPlan === 'Gold' }" class="flex flex-col items-center gap-3 rounded-lg bg-white p-4 cursor-pointer">
 								<p class="font-bold text-lg">Gold</p>
 								<div class="flex items-center gap-4"> </div>
 								<div class="flex items-center gap-4">
@@ -69,7 +69,7 @@
 									</div>
 								</div>
 							</div>
-							<div @click="planSeleccionado = 'Silver'" class="flex flex-col items-center gap-3 rounded-lg p-4 cursor-pointer bg-gray-50 border-2 border-blue-300">
+							<div @click="selectPlan('Silver')" :class="{ 'selected-plan': selectedPlan === 'Silver' }" class="flex flex-col items-center gap-3 rounded-lg bg-white p-4 cursor-pointer">
 								<p class="font-bold text-lg">Silver</p>
 								<div class="flex items-center gap-4"> </div>
 								<div class="flex items-center gap-4">
@@ -87,9 +87,8 @@
 									</div>
 								</div>
 							</div>
-							<div @click="planSeleccionado = 'Copper'" class="flex flex-col items-center gap-3 rounded-lg bg-white p-4 cursor-pointer hover:bg-gray-50 border-2 border-transparent hover:border-blue-300">
+							<div @click="selectPlan('Copper')" :class="{ 'selected-plan': selectedPlan === 'Copper' }" class="flex flex-col items-center gap-3 rounded-lg bg-white p-4 cursor-pointer">
 								<p class="font-bold text-lg">Copper</p>
-								<div @click="planSeleccionado = 'Copper'" class="flex items-center gap-4"> </div>
 								<div class="flex items-center gap-4">
 									<div class="flex flex-col items-center gap-1">
 										<p class="font-semibold">$ 55,000</p>
@@ -134,7 +133,11 @@
 		password: '',
 		password_confirmation: '',
 	};
-	const planSeleccionado = ref('Silver'); // Initialize it as Silver plan
+	const selectedPlan = ref('Silver'); // Initialize it as Silver plan
+
+	function selectPlan(plan) {
+		selectedPlan.value = plan;
+	}
 
 	async function enviarFormulario() {	
 		if(formData.password != formData.password_confirmation) {
@@ -149,7 +152,7 @@
 			const { data: planesData, error: planesError } = await supabase
 				.from('planes')
 				.select('nombre')
-				.eq('nombre', planSeleccionado.value);
+				.eq('nombre', selectedPlan.value);
 
 			if (planesError || !planesData || planesData.length === 0) {
 				alert('El plan seleccionado no existe.');
@@ -160,8 +163,7 @@
 				.from('clientes')
 				.select('email')
 				.eq('email', formData.correo);
-
-			if (!correoError || dataCorreo || dataCorreo.length > 0) {
+			if (dataCorreo.length > 0) {
 				alert('El correo introducido ya pertenece a otro usuario registrado.');
 				return;
 			}
@@ -177,7 +179,7 @@
 					sexo: formData.sexo,
 					email: formData.correo,
 					contrasena: formData.password,
-					nombre_plan: planSeleccionado.value,
+					nombre_plan: selectedPlan.value,
 					// Add other fields as needed
 				};
 
@@ -189,6 +191,7 @@
 
 				if (error) {
 					console.error('Error inserting data:', error);
+					alert("Hubo un error al registrarse, por favor asegurese de llenar todos los campos.")
 				} else {
 					console.log('Data inserted successfully:', data);
 					alert("Usuario creado con éxito!");
@@ -202,3 +205,10 @@
 	}
 
 </script>
+
+<style scoped>
+.selected-plan {
+	background-color: #3d3bbe; /* Yellow color */
+	border-color: #000000; /* Orange color */
+}
+</style>
