@@ -3,13 +3,13 @@
 	  <div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-4">
 		<div class="flex flex-col gap-1">
 		  <label for="email">Correo electrónico</label>
-		  <input v-model="email" type="email" id="email" class="input-text">
+		  <input v-model="email" type="email" id="email" class="input-text" v-on:input="verifyMail()">
 		</div>
 		<div class="flex flex-col gap-1">
 		  <label for="password">Contraseña</label>
 		  <input v-model="password" type="password" id="password" class="input-text">
 		</div>
-		<button @click="login" type="button" class="border rounded border-green-700 text-green-700 px-3 py-2">
+		<button v-bind:disabled="loginButtonDisabled" @click="login" type="button" class="border rounded border-green-700 text-green-700 px-3 py-2 disabled:opacity-25">
 		  Ingresar
 		</button>
 		<div v-if="authMessage" :class="{ 'text-green-700': isAuthSuccess, 'text-red-700': !isAuthSuccess }">
@@ -22,7 +22,7 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
   import { supabase } from '../supabase.js';
   import { useRouter } from 'vue-router'; // Import useRouter
   import { credenciales,isLoggedIn } from '../router/index.js'; // Import isLoggedIn from the global state
@@ -33,6 +33,16 @@
   const password = ref('');
   const authMessage = ref('');
   const router = useRouter(); // Get the router instance-
+
+  const validEmail = ref(false); 
+
+  function verifyMail(){
+	validEmail.value = /^[^@]+@\w+(\.\w+)+\w$/.test(this.email);
+  };
+
+  let loginButtonDisabled = computed( () => {
+	return (password.value.length == 0 || !validEmail.value);
+  });
 
   const login = async () => {
 	const { data: userData, error: authError } = await supabase
