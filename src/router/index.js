@@ -73,7 +73,7 @@ const router = createRouter({
     ]
 })
 
-export const credenciales = ref('');
+export const userInfo = ref('');
 // Agrega un guardia de navegación global para verificar quien esta logeado
 export const isAdminLoggedIn = ref(false);
 export const isEmployeeLoggedIn = ref(false);

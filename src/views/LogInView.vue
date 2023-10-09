@@ -25,7 +25,7 @@
   import { ref, computed } from 'vue';
   import { supabase } from '../supabase.js';
   import { useRouter } from 'vue-router'; // Import useRouter
-  import { credenciales, isEmployeeLoggedIn, isClientLoggedIn, isAdminLoggedIn } from '../router/index.js';
+  import { userInfo, isEmployeeLoggedIn, isClientLoggedIn, isAdminLoggedIn } from '../router/index.js';
 
 
 
@@ -53,7 +53,7 @@
 	.eq('contrasena', password.value);
 	if ( adminData.length > 0) {
 		isAdminLoggedIn.value = true;
-		router.push('/admin');	
+		router.push('/plans');	
 	} else if (true) {
 		//busco en la tabla de empleados
 		const { data: empleadoData } = await supabase
@@ -64,7 +64,11 @@
 		if ( empleadoData.length > 0) {
 			isEmployeeLoggedIn.value = true;
 			router.push('/employee');
-			
+			userInfo.value = {
+				"nombre":empleadoData[0].nombre,
+				"apellido":empleadoData[0].apellido,
+				"nro_legajo":empleadoData[0].id_empleados
+			}
 		} else if (true) {
 			//busco en la tabla de clientes
 			const { data: userData } = await supabase
@@ -75,7 +79,7 @@
 			if (userData.length > 0) {
 				router.push('/client');
 				isClientLoggedIn.value = true;
-				credenciales.value = {
+				userInfo.value = {
 					"nombre":userData[0].nombres,
 					"apellido":userData[0].apellidos,
 					"nroAfiliado":userData[0].nro_afiliado,

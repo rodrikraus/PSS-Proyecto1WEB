@@ -10,7 +10,7 @@
 		  <RouterLink v-if="isClientLoggedIn" :to="{ name: 'plansInfo' }">Planes</RouterLink>
 		  <RouterLink v-if="isAdminLoggedIn" :to="{ name: 'plans' }">Planes</RouterLink>
 		  <RouterLink v-if="isAdminLoggedIn" :to="{ name: 'empleados' }">Empleados</RouterLink>
-		  <RouterLink v-if="isClientLoggedIn || isAdminLoggedIn || isEmployeeLoggedIn" :to="{ name: 'profile' }">Mi Perfil</RouterLink>
+		  <RouterLink v-if="(isClientLoggedIn || isEmployeeLoggedIn) && !isAdminLoggedIn" :to="{ name: 'profile' }">Mi Perfil</RouterLink>
 		  <a v-if="isClientLoggedIn || isAdminLoggedIn || isEmployeeLoggedIn" @click="logout" href="#">Salir</a>
 		</nav>
 	  </div>
@@ -25,7 +25,7 @@
   
   <script setup>
   import { RouterLink, useRouter } from 'vue-router';
-  import { credenciales, isAdminLoggedIn, isEmployeeLoggedIn, isClientLoggedIn } from './router/index.js';
+  import { userInfo, isAdminLoggedIn, isEmployeeLoggedIn, isClientLoggedIn } from './router/index.js';
 
   const router = useRouter();
   

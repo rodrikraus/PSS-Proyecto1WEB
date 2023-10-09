@@ -2,8 +2,8 @@
 	<div class="container mx-auto flex gap-10">
 		<div class="flex-grow flex flex-col gap-3">
 			<div class="flex justify-between items-center">
-				<p class="text-blue-800 text-3xl">Hola, {{ credenciales.nombre }}</p>
-				<p class="text-gray-400">Nº de Legajo <span class="font-bold">{{ credenciales.nroAfiliado }}</span></p>
+				<p class="text-blue-800 text-3xl">Hola, {{ userInfo.nombre }}</p>
+				<p class="text-gray-400">Nº de Legajo <span class="font-bold">{{ userInfo.nro_legajo }}</span></p>
 			</div>
 			<div class="flex gap-10">
 				<div class="flex-grow flex flex-col gap-3">
@@ -51,7 +51,7 @@
 							<i class="fa-solid fa-search"></i>
 						</button>
 					</div>
-					<div v-if="cliente" class="flex items-center gap-3 px-3 py-2">
+					<div v-for="cliente in clientes" class="flex items-center gap-3 px-3 py-2">
 						<p class="flex font-bold">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
 						<p class="text-sm text-gray-400">{{ cliente.nombre_plan}}</p>
 						<button type="button" class="btn border-blue-700 text-blue-700">Ver</button>
@@ -91,12 +91,12 @@
 </template>
 
 <script setup>
-import { credenciales } from '../../router';
+import { userInfo } from '../../router';
 import { supabase } from '../../supabase.js';
 import { ref } from 'vue';
 
 const search = ref(''); //texto ingresado a buscar como nombre de cliente
-const cliente = ref('');
+const clientes = ref(''); //clientes retornados como resultado de la busqueda (por nombre)
 
 const buscar = async () => {
 	const { data: userData, error: searchError } = await supabase
@@ -104,9 +104,9 @@ const buscar = async () => {
 		.select('*')
 		.eq('nombres', search.value);
 	if(!searchError && userData.length > 0){
-		cliente.value = userData[0];
+		clientes.value = userData;
 	}
-	else cliente.value = null;
+	else clientes.value = null;
 };
 
 </script>

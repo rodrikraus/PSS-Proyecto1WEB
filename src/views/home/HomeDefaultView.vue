@@ -8,14 +8,14 @@
 <script setup>
 	import { ref } from 'vue';
   	import { useRouter } from 'vue-router';
-	import { credenciales } from '@/router/index.js';
+	import { isAdminLoggedIn, isEmployeeLoggedIn, isClientLoggedIn } from '@/router/index.js';
 
 	const router = useRouter()
-	if(credenciales.value.rol==="cliente")
+	if(isClientLoggedIn)
 		router.push('/client');
-	else if(credenciales.value.rol==="empleado")
+	else if(isEmployeeLoggedIn)
 		router.push('/employee');
-	else if(credenciales.value.rol==="admin")
+	else if(isAdminLoggedIn)
 		router.push('/plans');
 </script>
 
