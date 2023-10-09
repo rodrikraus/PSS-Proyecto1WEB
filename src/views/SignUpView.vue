@@ -142,8 +142,6 @@
 	async function enviarFormulario() {	
 		if(formData.password != formData.password_confirmation) {
 			alert("Confirmacion de password erronea.");		
-			console.log(formData.password);
-			console.log(formData.password_confirmation);
 			return;
 		}
 		
@@ -182,18 +180,13 @@
 					nombre_plan: selectedPlan.value,
 					// Add other fields as needed
 				};
-
-				// Log the data before inserting
-				console.log('Data to be inserted:', clientData);
-
-				// Insert data into the "clientes" table
+				
 				const { data, error } = await supabase.from('clientes').insert(clientData);
 
 				if (error) {
 					console.error('Error inserting data:', error);
 					alert("Hubo un error al registrarse, por favor asegurese de llenar todos los campos.")
 				} else {
-					console.log('Data inserted successfully:', data);
 					alert("Usuario creado con éxito!");
 					router.push('/');
 				}

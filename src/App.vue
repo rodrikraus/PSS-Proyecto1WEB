@@ -3,15 +3,15 @@
 	  <div class="flex justify-between items-center gap-3">
 		<p>OSPIFAK</p>
 		<nav class="flex items-center gap-5">
-		  <RouterLink v-if="!isLoggedIn" :to="{ name: 'login' }">Iniciar sesión</RouterLink>
-          <RouterLink v-if="isLoggedIn && credenciales.rol!=='admin'" :to="{ name: 'home' }">Home</RouterLink>
-		  <RouterLink v-if="credenciales.rol==='cliente'" to="#">Reintegros y Prestaciones</RouterLink>
-		  <RouterLink v-if="credenciales.rol==='empleado'" to="#">Reintegros y Prestaciones</RouterLink>
-		  <RouterLink v-if="credenciales.rol==='cliente'" :to="{ name: 'plansInfo' }">Planes</RouterLink>
-		  <RouterLink v-if="credenciales.rol==='admin'" :to="{ name: 'plans' }">Planes</RouterLink>
-		  <RouterLink v-if="credenciales.rol==='admin'" :to="{ name: 'empleados' }">Empleados</RouterLink>
-		  <RouterLink v-if="isLoggedIn && credenciales.rol!=='admin'" :to="{ name: 'profile' }">Mi Perfil</RouterLink>
-		  <a v-if="isLoggedIn" @click="logout" href="#">Salir</a>
+		  <RouterLink v-if="!isClientLoggedIn && !isEmployeeLoggedIn && !isAdminLoggedIn" :to="{ name: 'login' }">Iniciar sesión</RouterLink>
+          <RouterLink v-if="isClientLoggedIn" :to="{ name: 'home' }">Home</RouterLink>
+		  <RouterLink v-if="isClientLoggedIn" to="#">Reintegros y Prestaciones</RouterLink>
+		  <RouterLink v-if="isEmployeeLoggedIn" to="#">Reintegros y Prestaciones</RouterLink>
+		  <RouterLink v-if="isClientLoggedIn" :to="{ name: 'plansInfo' }">Planes</RouterLink>
+		  <RouterLink v-if="isAdminLoggedIn" :to="{ name: 'plans' }">Planes</RouterLink>
+		  <RouterLink v-if="isAdminLoggedIn" :to="{ name: 'empleados' }">Empleados</RouterLink>
+		  <RouterLink v-if="isClientLoggedIn || isAdminLoggedIn || isEmployeeLoggedIn" :to="{ name: 'profile' }">Mi Perfil</RouterLink>
+		  <a v-if="isClientLoggedIn || isAdminLoggedIn || isEmployeeLoggedIn" @click="logout" href="#">Salir</a>
 		</nav>
 	  </div>
 	</header>
@@ -25,12 +25,15 @@
   
   <script setup>
   import { RouterLink, useRouter } from 'vue-router';
-  import { credenciales, isLoggedIn } from './router/index.js'; // Import isLoggedIn from the global state
+  import { credenciales, isAdminLoggedIn, isEmployeeLoggedIn, isClientLoggedIn } from './router/index.js';
 
   const router = useRouter();
   
   const logout = () => {
-	isLoggedIn.value = false;
+	isAdminLoggedIn.value = false;
+	isEmployeeLoggedIn.value = false;
+	isClientLoggedIn.value = false;
+
 	router.push({ name: 'login' });
   };
   </script>

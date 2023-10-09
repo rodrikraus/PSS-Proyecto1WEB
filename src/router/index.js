@@ -74,17 +74,22 @@ const router = createRouter({
 })
 
 export const credenciales = ref('');
-// Agrega un guardia de navegación global para verificar isLoggedIn
-export const isLoggedIn = ref(false);
+// Agrega un guardia de navegación global para verificar quien esta logeado
+export const isAdminLoggedIn = ref(false);
+export const isEmployeeLoggedIn = ref(false);
+export const isClientLoggedIn = ref(false);
+
+
+//Solo se puede ir a /login o /signup si no hay nadie logeado
 router.beforeEach((to, from, next) => {
-  
-    if (to.name !== 'login' &&  to.name !== 'signup' &&  to.name !== 'password.recover' && !isLoggedIn.value) { //(se usa value porque es una variable global)
-      // Si no estás en la página de inicio de sesión y no estás autenticado, redirige a la página de inicio de sesión
-      next({ name: 'login' });
+    if ((to.name !== 'login' && to.name !== 'signup') &&
+      (!isAdminLoggedIn.value && !isEmployeeLoggedIn.value && !isClientLoggedIn.value)) {
+      next({ name: 'login' }); //te redirije al login
     } else {
-      // Si estás autenticado o en la página de inicio de sesión, permite la navegación
+      // Allow navigation for other routes
       next();
     }
   });
+  
 
 export default router

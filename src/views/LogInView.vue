@@ -25,7 +25,7 @@
   import { ref, computed } from 'vue';
   import { supabase } from '../supabase.js';
   import { useRouter } from 'vue-router'; // Import useRouter
-  import { credenciales,isLoggedIn } from '../router/index.js'; // Import isLoggedIn from the global state
+  import { credenciales, isEmployeeLoggedIn, isClientLoggedIn, isAdminLoggedIn } from '../router/index.js';
 
 
 
@@ -33,7 +33,7 @@
   const password = ref('');
   const authMessage = ref('');
   const router = useRouter(); // Get the router instance-
-
+  const isAuthSuccess = ref(false);
   const validEmail = ref(false); 
 
   function verifyMail(){
@@ -45,71 +45,86 @@
   });
 
   const login = async () => {
-	const { data: userData, error: authError } = await supabase
-	  .from('clientes')//usuarios
-	  .select('*')
-	  .eq('email', email.value)
-	  .eq('contrasena', password.value);
-	if (authError) {
-		console.log(email.value)
-		console.log(password.value)
-	  authMessage.value = 'Error al iniciar sesión';
-	} else if (userData.length > 0) {
-		authMessage.value = 'Inicio de sesión correcto';
-	  	//Se setea la variable isLoggedIn en true y se redirige al home
-	  	isLoggedIn.value = true;
-		//credenciales.value = userData[0];
-		credenciales.value = {
-			"nombre":userData[0].nombres,
-			"apellido":userData[0].apellidos,
-			"nroAfiliado":userData[0].nro_afiliado,
-			"rol":"cliente", //cliente, empleado, admin
-			"plan":{
-				"nombre":userData[0].nombre_plan,
-				"vencimiento":"20/10/23"
-			},
-			"coTitulares": [		//Ver como obtener todos los cotitulares
-				{
-					"nombre":"Jane",
-					"apellido":"Doe",
-					"relacion":"conyuge",
-					"plan":{
-						"nombre":"Silver",
-						"vencimiento":"20/10/23"
-					},
-				},
-				{
-					"nombre":"Joanne",
-					"apellido":"Doe",
-					"relacion":"hijo/a",
-					"plan":{
-						"nombre":"Copper",
-						"vencimiento":"20/10/23"
-					},
-				},
-				{
-					"nombre":"Joe",
-					"apellido":"Doe",
-					"relacion":"hijo/a",
-					"plan":{
-						"nombre":"Copper",
-						"vencimiento":"16/10/24"
-					},
-				}
-			]
-		}
-		if(credenciales.value.rol=="cliente")	//Hacer varios pedidos
-			router.push('/client');
-		else if(credenciales.value.rol=="empleado")
+//busco en la tabla de empleados
+	const { data: adminData } = await supabase
+	.from('administradores')
+	.select('*')
+	.eq('email', email.value)
+	.eq('contrasena', password.value);
+	if ( adminData.length > 0) {
+		isAdminLoggedIn.value = true;
+		router.push('/admin');	
+	} else if (true) {
+		//busco en la tabla de empleados
+		const { data: empleadoData } = await supabase
+		.from('empleados')
+		.select('*')
+		.eq('email', email.value)
+		.eq('contrasena', password.value);
+		if ( empleadoData.length > 0) {
+			isEmployeeLoggedIn.value = true;
 			router.push('/employee');
-		else if(credenciales.value.rol=="admin")
-			router.push('/plans');
-		else
-			router.push('/');
-	} else {
-	  authMessage.value = 'Credenciales incorrectas';
-	}
+			
+		} else if (true) {
+			//busco en la tabla de clientes
+			const { data: userData } = await supabase
+			.from('clientes')
+			.select('*')
+			.eq('email', email.value)
+			.eq('contrasena', password.value);
+			if (userData.length > 0) {
+				router.push('/client');
+				isClientLoggedIn.value = true;
+				credenciales.value = {
+					"nombre":userData[0].nombres,
+					"apellido":userData[0].apellidos,
+					"nroAfiliado":userData[0].nro_afiliado,
+					"plan":{
+						"nombre":userData[0].nombre_plan,
+						"vencimiento":"20/10/23"
+					},
+					"coTitulares": [		//Ver como obtener todos los cotitulares
+						{
+							"nombre":"Jane",
+							"apellido":"Doe",
+							"relacion":"conyuge",
+							"plan":{
+								"nombre":"Silver",
+								"vencimiento":"20/10/23"
+							},
+						},
+						{
+							"nombre":"Joanne",
+							"apellido":"Doe",
+							"relacion":"hijo/a",
+							"plan":{
+								"nombre":"Copper",
+								"vencimiento":"20/10/23"
+							},
+						},
+						{
+							"nombre":"Joe",
+							"apellido":"Doe",
+							"relacion":"hijo/a",
+							"plan":{
+								"nombre":"Copper",
+								"vencimiento":"16/10/24"
+							},
+						}
+					]
+				}
+			}
+		} else {
+			authMessage.value = 'Credenciales incorrectas';
+		}
+	 }
+	
+
+	
+
+	
   };
   </script>
   
-  
+ 
+ 
