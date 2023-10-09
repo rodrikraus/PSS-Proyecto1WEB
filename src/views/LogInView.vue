@@ -73,7 +73,7 @@
 			//busco en la tabla de clientes
 			const { data: userData } = await supabase
 			.from('clientes')
-			.select('*')
+			.select('*, cotitulares (*)')
 			.eq('email', email.value)
 			.eq('contrasena', password.value);
 			if (userData.length > 0) {
@@ -85,37 +85,9 @@
 					"nroAfiliado":userData[0].nro_afiliado,
 					"plan":{
 						"nombre":userData[0].nombre_plan,
-						"vencimiento":"20/10/23"
+						"vencimiento":"20/10/23"			//Ver de agregar vencimiento o calcularlo?
 					},
-					"coTitulares": [		//Ver como obtener todos los cotitulares
-						{
-							"nombre":"Jane",
-							"apellido":"Doe",
-							"relacion":"conyuge",
-							"plan":{
-								"nombre":"Silver",
-								"vencimiento":"20/10/23"
-							},
-						},
-						{
-							"nombre":"Joanne",
-							"apellido":"Doe",
-							"relacion":"hijo/a",
-							"plan":{
-								"nombre":"Copper",
-								"vencimiento":"20/10/23"
-							},
-						},
-						{
-							"nombre":"Joe",
-							"apellido":"Doe",
-							"relacion":"hijo/a",
-							"plan":{
-								"nombre":"Copper",
-								"vencimiento":"16/10/24"
-							},
-						}
-					]
+					"cotitulares": userData[0].cotitulares
 				}
 			}
 		} else {
