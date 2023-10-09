@@ -20,6 +20,9 @@
             <div v-if="showSuccessAlert" class="alert-success flex flex-col gap-3">
                 <p>El plan ha sido eliminado con éxito.</p>
             </div>
+            <div v-if="showErrorAlert" class="alert-error flex flex-col gap-3">
+                <p>El plan no puede ser eliminado porque hay clientes asociados al mismo.</p>
+            </div>
         </div>
     </div>
 </template>

@@ -11,18 +11,18 @@
 			<div class="flex justify-between items-center gap-3 px-3">
 				<p class="text-blue-800 text-3xl">Planes</p>
 				<button type="button" class="btn border-green-700 text-green-700"
-					@click="addPlanModal('add-plan-modal')">Agregar</button>
+					@click="showModal('add-plan-modal')">Agregar</button>
 			</div>
 			<div class="flex flex-col divide-y">
 				<div v-for="plan in plans" class="flex items-center gap-3 px-3 py-2">
 					<div class="flex-grow flex flex-col">
 						<p class="font-semibold text-lg">{{ plan.nombre }}</p>
-						<p class="text-gray-400 italic text-sm">132 clientes</p>
+						<p class="text-gray-400 italic text-sm">{{ plan.client_count }} clientes</p>
 					</div>
 					<button type="button" class="btn border-blue-700 text-blue-700"
-						@click="editPlanModal('edit-plan-modal', plan)">Editar</button>
+						@click="showModal('edit-plan-modal', plan)">Editar</button>
 					<button type="button" class="btn border-red-700 text-red-700"
-						@click="deletePlanModal('delete-plan-modal', plan)">Eliminar</button>
+						@click="showModal('delete-plan-modal', plan)">Eliminar</button>
 				</div>
 			</div>
 		</div>
@@ -63,6 +63,29 @@ const fetchPlans = async () => {
 		errorMessage.value = 'Error al cargar los planes';
 	} else if (data.length > 0) {
 		plans.value = data;
+		await fetchClientCounts();
+	}
+};
+
+const fetchClientCounts = async () => {
+	try {
+		await Promise.all(
+			plans.value.map(async (plan) => {
+				const { data, error } = await supabase
+					.from('clientes')
+					.select('nombre_plan')
+					.eq('nombre_plan', plan.nombre);
+
+				if (error) {
+					console.error(error);
+				} else {
+					// Contar la cantidad de resultados para obtener el recuento de clientes
+					plan.client_count = data.length;
+				}
+			})
+		);
+	} catch (error) {
+		console.error(error);
 	}
 };
 
@@ -94,10 +117,14 @@ const moveToSelected = () => {
 	}
 };
 
-const addPlanModal = function (id) {
+const showModal = function (id, plan = null) {
 	showSuccessAlert.value = false;
 	showErrorAlert.value = false;
-	selectedPlan.value = [];
+	if (plan) {
+		selectedPlan.value = plan;
+	} else {
+		selectedPlan.value = [];
+	}
 	const modal = document.getElementById(id)
 	if (modal.classList.contains('hidden')) {
 		modal.classList.add('flex')
@@ -131,21 +158,8 @@ const addPlan = async () => {
 	}
 };
 
-const deletePlanModal = function (id, plan = null) {
-	showSuccessAlert.value = false;
-	showErrorAlert.value = false;
-	if (plan) {
-		const modal = document.getElementById(id)
-		selectedPlan.value = plan
-		if (modal.classList.contains('hidden')) {
-			modal.classList.add('flex')
-			modal.classList.remove('hidden')
-		}
-	}
-};
-
 const deletePlan = async () => {
-	if (selectedPlan.value) {
+	if (selectedPlan.value && selectedPlan.value.client_count == 0) {
 		const { data: data, error: error } = await supabase
 			.from('planes')
 			.delete()
@@ -157,18 +171,8 @@ const deletePlan = async () => {
 			showSuccessAlert.value = true;
 		}
 	}
-};
-
-const editPlanModal = function (id, plan = null) {
-	showSuccessAlert.value = false;
-	showErrorAlert.value = false;
-	if (plan) {
-		const modal = document.getElementById(id)
-		selectedPlan.value = plan
-		if (modal.classList.contains('hidden')) {
-			modal.classList.add('flex')
-			modal.classList.remove('hidden')
-		}
+	else {
+		showErrorAlert.value = true;
 	}
 };
 
@@ -208,6 +212,7 @@ const closeModal = function (id) {
 		modal.classList.remove('flex')
 	}
 	showSuccessAlert.value = false;
+	showErrorAlert.value = false;
 };
 
 const closeAllModals = function () {
@@ -217,6 +222,7 @@ const closeAllModals = function () {
 		modal.classList.add('hidden')
 		modal.classList.remove('flex')
 	}
+	showErrorAlert.value = false;
 };
 
 onMounted(() => {
