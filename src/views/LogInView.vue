@@ -45,7 +45,7 @@
   });
 
   const login = async () => {
-//busco en la tabla de empleados
+	//busco en la tabla de admins
 	const { data: adminData } = await supabase
 	.from('administradores')
 	.select('*')
@@ -89,6 +89,8 @@
 					},
 					"cotitulares": userData[0].cotitulares
 				}
+			} else {
+				authMessage.value = 'Credenciales incorrectas';
 			}
 		} else {
 			authMessage.value = 'Credenciales incorrectas';
