@@ -139,12 +139,45 @@
 		selectedPlan.value = plan;
 	}
 
+	
+	function validarDni(dni) {
+		//Verifica que tiene de 7 a 8 digitos.
+		const dniRegex = /^\d{7,8}$/;
+
+		if (!dniRegex.test(dni)) {
+			alert("Formato de DNI inválido. Asegurese que el DNI tiene de 7 a 8 digitos.");
+			return false;
+		}
+
+		return true;
+  	}
+
+	function validarTelefono(telefono) {
+		//Verifica que tiene 10 digitos.
+		const telefonoRegex = /^\d{10}$/;
+
+		if (!telefonoRegex.test(telefono)) {
+			alert("Formato de teléfono inválido. Asegurese que el numero tiene 10 digitos.");
+			return false;
+		}
+
+		return true;
+  	}
+
 	async function enviarFormulario() {	
 		if(formData.password != formData.password_confirmation) {
 			alert("Confirmacion de password erronea.");		
 			return;
 		}
-		
+
+		if (!validarDni(formData.dni)) {
+      		return;
+    	}
+
+		if (!validarTelefono(formData.telefono)) {
+      		return;
+    	}
+
 		try {
 			// Miro si existe el plan
 			const { data: planesData, error: planesError } = await supabase
