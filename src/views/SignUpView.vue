@@ -118,6 +118,8 @@
 	import { ref } from 'vue'; // Import ref to create a reactive variable
 	import { supabase } from '../supabase.js';
 	import { useRouter } from 'vue-router'; // Import useRouter
+	import { isAfter, subYears } from 'date-fns'; // Importa isAfter y subYears de date-fns
+
 
 	const router = useRouter();
 
@@ -139,6 +141,17 @@
 		selectedPlan.value = plan;
 	}
 
+	function validarFechaNacimiento(fechaNacimiento) {
+		const fechaNacimientoDate = new Date(fechaNacimiento);
+		const fechaHace18Anios = subYears(new Date(), 18);
+
+		if (isAfter(fechaNacimientoDate, fechaHace18Anios)) {
+			alert('Debes ser mayor de 18 años para registrarte.');
+			return false;
+		}
+
+		return true;
+	}
 	
 	function validarDni(dni) {
 		//Verifica que tiene de 7 a 8 digitos.
@@ -167,6 +180,10 @@
 	async function enviarFormulario() {	
 		if(formData.password != formData.password_confirmation) {
 			alert("Confirmacion de password erronea.");		
+			return;
+		}
+
+		if (!validarFechaNacimiento(formData.nacimiento)) {
 			return;
 		}
 
