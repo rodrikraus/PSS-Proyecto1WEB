@@ -11,6 +11,8 @@ import EmployeeHomeView from '../views/home/EmployeeHomeView.vue'
 import RecoverPasswordView from '../views/RecoverPasswordView.vue'
 import ProfileIndexView from '../views/profile/ProfileIndexView.vue'
 import HomeDefaultView from '../views/home/HomeDefaultView.vue'
+import ServicesIndexView from '../views/services/ServicesIndexView.vue'
+import EmployeeProfileIndexView from '@/views/profile/EmployeeProfileIndexView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,6 +61,16 @@ const router = createRouter({
             path: '/profile',
             name: 'profile',
             component: ProfileIndexView
+        },
+        {
+            path: '/profile/employee',
+            name: 'profile.employee',
+            component: EmployeeProfileIndexView
+        },
+        {
+            path: '/services',
+            name: 'services',
+            component: ServicesIndexView
         },
         {
             path: '/password/recover',
