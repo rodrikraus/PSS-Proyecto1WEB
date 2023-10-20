@@ -7,7 +7,7 @@
           <RouterLink v-if="isClientLoggedIn" :to="{ name: 'home' }">Home</RouterLink>
 		  <RouterLink v-if="isClientLoggedIn" to="#">Reintegros y Prestaciones</RouterLink>
 		  <RouterLink v-if="isEmployeeLoggedIn" to="#">Reintegros y Prestaciones</RouterLink>
-		  <!--<RouterLink :to="{name: 'services'}">Prestaciones</RouterLink>-->
+		  <RouterLink v-if="isAdminLoggedIn" :to="{name: 'services'}">Prestaciones</RouterLink>
 		  <RouterLink v-if="isClientLoggedIn" :to="{ name: 'plansInfo' }">Planes</RouterLink>
 		  <RouterLink v-if="isAdminLoggedIn" :to="{ name: 'plans' }">Planes</RouterLink>
 		  <RouterLink v-if="isAdminLoggedIn" :to="{ name: 'empleados' }">Empleados</RouterLink>

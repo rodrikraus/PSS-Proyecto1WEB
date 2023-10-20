@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onBeforeMount, computed } from 'vue';
 import { supabase } from '../../supabase.js';
 import EditPlanModal from './EditPlanModal.vue';
 import AddPlanModal from './AddPlanModal.vue';
@@ -134,7 +134,7 @@ const showModal = function (id, plan = null) {
 	showSuccessAlert.value = false;
 	showErrorAlert.value = false;
 	if (plan) {
-		selectedPlan.value = plan;
+		selectedPlan.value = JSON.parse(JSON.stringify(plan));
     	fetchSelectedPrestaciones(plan);
 	} else {
 		selectedPlan.value = [];
@@ -167,6 +167,7 @@ const addPlan = async () => {
 		} else {
 			fetchPlans();
 			showSuccessAlert.value = true;
+			showErrorAlert.value = false;
 		}
 	} catch (e) {
 		console.error(e);
@@ -241,7 +242,7 @@ const closeAllModals = function () {
 	showErrorAlert.value = false;
 };
 
-onMounted(() => {
+onBeforeMount(() => {
 	fetchPlans();
 	fetchPrestaciones();
 });
