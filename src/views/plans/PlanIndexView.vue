@@ -1,7 +1,7 @@
 <template>
-	<EditPlanModal :selectedPlan="selectedPlan" :showSuccessAlert="showSuccessAlert" :showErrorAlert="showErrorAlert"
-		@close="closeModal" @save="editPlan" />
-	<AddPlanModal :selectedPlan="selectedPlan" :showSuccessAlert="showSuccessAlert" :showErrorAlert="showErrorAlert"
+	<EditPlanModal :selectedPlan="selectedPlan" :showSuccessAlert="showSuccessAlert" :showErrorAlert="showErrorAlert" :prestacionesDisponibles="prestacionesDisponibles" :selectedPrestaciones="selectedPrestaciones" :prestacionesSeleccionadasNuevas="prestacionesSeleccionadasNuevas"
+		@close="closeModal" @save="editPlan"/>
+	<AddPlanModal :selectedPlan="selectedPlan" :showSuccessAlert="showSuccessAlert" :showErrorAlert="showErrorAlert" :prestacionesDisponibles="prestacionesDisponibles" :selectedPrestaciones="selectedPrestaciones"
 		@close="closeModal" @save="addPlan" />
 	<DeletePlanModal :selectedPlan="selectedPlan" :showSuccessAlert="showSuccessAlert" :showErrorAlert="showErrorAlert"
 		@close="closeModal" @delete="deletePlan" />
@@ -30,19 +30,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { supabase } from '../../supabase.js';
 import EditPlanModal from './EditPlanModal.vue';
 import AddPlanModal from './AddPlanModal.vue';
 import DeletePlanModal from './DeletePlanModal.vue';
 
 const plans = ref([]);
-const prestaciones = ref([]);
 const selectedPlan = ref([]);
+
+const prestaciones = ref([]);
+const selectedPrestaciones = ref([]);
+
+const prestacionesSeleccionadasNuevas = ref([]);
+
 const showSuccessAlert = ref(false);
 const showErrorAlert = ref(false);
-
-const selectedPrestaciones = ref([]);
 
 const fetchPrestaciones = async () => {
 	const { data: data, error: error } = await supabase
@@ -67,6 +70,31 @@ const fetchPlans = async () => {
 	}
 };
 
+
+const prestacionesDisponibles = computed(() => {
+	if (!selectedPlan) {
+		return prestaciones.value;
+	} else {
+		return prestaciones.value.filter((prestacion) => {
+		return !selectedPrestaciones.value.some((selected) => selected.nombre === prestacion.nombre);
+		});
+	}
+	});
+
+/*
+const computePrestacionesDisponibles = () => {
+	console.log(selectedPlan.value);
+	console.log(prestaciones.value);
+	console.log(selectedPrestaciones.value);
+    if (!selectedPlan.value || !prestaciones.value || !selectedPrestaciones.value) {
+        return prestaciones.value;
+    } else {
+        return prestaciones.value.filter((prestacion) => {
+            return !selectedPrestaciones.value.some((selected) => selected.nombre === prestacion.nombre);
+        });
+    }
+};
+*/
 const fetchClientCounts = async () => {
 	try {
 		await Promise.all(
@@ -75,7 +103,6 @@ const fetchClientCounts = async () => {
 					.from('clientes')
 					.select('nombre_plan')
 					.eq('nombre_plan', plan.nombre);
-
 				if (error) {
 					console.error(error);
 				} else {
@@ -89,31 +116,17 @@ const fetchClientCounts = async () => {
 	}
 };
 
-const fetchSelectedPrestaciones = async () => {
+const fetchSelectedPrestaciones = async (plan) => {
 	const { data: data, error: error } = await supabase
-		.from('prestaciones')
-		.select('*')
-		.eq('id', selectedPlan.value.id)
+		.from('ofrece')
+		.select('nombre')
+		.eq('id_plan', plan.id)
 	if (error) {
-		errorMessage.value = 'Error al cargar los planes';
+		console.log(error);
 	} else if (data.length > 0) {
 		selectedPrestaciones.value = data;
-	}
-};
-
-// Función para mover una prestación a "prestaciones disponibles"
-const moveToAvailable = () => {
-	if (selectedPrestaciones.value.length > 0) {
-		const prestacion = selectedPrestaciones.value.pop();
-		availablePrestaciones.value.push(prestacion);
-	}
-};
-
-// Función para mover una prestación a "prestaciones seleccionadas"
-const moveToSelected = () => {
-	if (availablePrestaciones.value.length > 0) {
-		const prestacion = availablePrestaciones.value.pop();
-		selectedPrestaciones.value.push(prestacion);
+	} else{
+		selectedPrestaciones.value = [];
 	}
 };
 
@@ -122,8 +135,10 @@ const showModal = function (id, plan = null) {
 	showErrorAlert.value = false;
 	if (plan) {
 		selectedPlan.value = plan;
+    	fetchSelectedPrestaciones(plan);
 	} else {
 		selectedPlan.value = [];
+		selectedPrestaciones.value = [];
 	}
 	const modal = document.getElementById(id)
 	if (modal.classList.contains('hidden')) {
@@ -178,7 +193,8 @@ const deletePlan = async () => {
 
 const editPlan = async () => {
 	if (selectedPlan.value) {
-		if (!selectedPlan.value.nombre || !selectedPlan.value.precio_menor_21 || !selectedPlan.value.precio_21_35 || !selectedPlan.value.precio_35_55 || !selectedPlan.value.precio_mayor_55) {
+		if (!selectedPlan.value.nombre || !selectedPlan.value.precio_menor_21 
+		|| !selectedPlan.value.precio_21_35 || !selectedPlan.value.precio_35_55 || !selectedPlan.value.precio_mayor_55) {
 			showErrorAlert.value = true;
 		}
 		else {

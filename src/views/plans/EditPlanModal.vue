@@ -30,8 +30,10 @@
                     <div class="flex items-center gap-3">
                         <div class="flex-grow">
                             <p class="font-bold">Prestaciones seleccionadas</p>
-                            <select multiple>
-                                <option>{{ }}</option>
+                            <select multiple v-model="selectedPrestacionesLocal">
+                                <option v-for="prestacion in seleccionadas" :key="prestacion" :value="prestacion">
+                                    {{ prestacion.nombre }}
+                                </option>
                             </select>
                         </div>
                         <div class="flex flex-col gap-3">
@@ -44,8 +46,10 @@
                         </div>
                         <div class="flex-grow">
                             <p class="font-bold">Prestaciones disponibles</p>
-                            <select multiple>
-                                <option>{{}}</option>
+                            <select multiple v-model="prestacionesDisponiblesLocal">
+                                <option v-for="prestacion in disponibles" :key="prestacion" :value="prestacion">
+                                    {{ prestacion.nombre }}
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -86,14 +90,48 @@
 </template>
 
 <script>
+import{ ref } from "vue";
+
 export default {
     emits: ['close', 'save'],
     props: {
         selectedPlan: Object,
         showSuccessAlert: Boolean,
+        prestacionesDisponibles: Array,
+        selectedPrestaciones: Array,
+        prestacionesSeleccionadasNuevas: Array,
         showErrorAlert: Boolean,
     },
-
+    computed:{
+        disponibles(){
+            return [
+                ...this.prestacionesDisponibles.filter(prestacion => !this.movidoASeleccionadas.includes(prestacion)),
+                ...this.movidoADisponibles
+            ];
+        },
+        seleccionadas(){
+            return [
+                ...this.selectedPrestaciones.filter(prestacion => !this.movidoADisponibles.includes(prestacion)),
+                ...this.movidoASeleccionadas
+            ];
+        },
+    },
+    setup(props) {
+        const movidoADisponibles = ref([]);
+        const movidoASeleccionadas = ref([]);
+        const selectedPrestaciones = ref(props.selectedPrestaciones);
+        const prestacionesDisponibles = ref(props.prestacionesDisponibles);
+        const selectedPrestacionesLocal = ref([]);
+        const prestacionesDisponiblesLocal = ref([]);
+        return {
+            movidoADisponibles,
+            movidoASeleccionadas,
+            selectedPrestaciones, 
+            prestacionesDisponibles,
+            selectedPrestacionesLocal, 
+            prestacionesDisponiblesLocal,
+        };
+    },
     methods: {
         closeModal() {
             this.$emit('close', 'edit-plan-modal');
@@ -102,6 +140,22 @@ export default {
         editPlan() {
             this.$emit('save');
         },
-    },
+        
+        moveToAvailable() {
+            for(let i = 0; i < this.selectedPrestacionesLocal.length; i++){
+                const prestacionToRemove = this.selectedPrestacionesLocal[i]; 
+                this.movidoADisponibles.push(prestacionToRemove);
+                this.movidoASeleccionadas = this.movidoASeleccionadas.filter(prestacion => prestacion !== prestacionToRemove);
+            }
+        },
+
+        moveToSelected() {
+            for(let i = 0; i < this.prestacionesDisponiblesLocal.length; i++){
+                const prestacionToRemove = this.prestacionesDisponiblesLocal[i]; 
+                this.movidoASeleccionadas.push(prestacionToRemove);
+                this.movidoADisponibles = this.movidoADisponibles.filter(prestacion => prestacion !== prestacionToRemove);
+            }
+        }
+    }
 }
 </script>
