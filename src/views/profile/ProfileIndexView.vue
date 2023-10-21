@@ -103,47 +103,49 @@
 			</div>
 		</div>
 	</form>
-	<div id="edit-profile-modal" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-30 hidden justify-center items-center z-20 modal" @click="closeAllModals">
-		<div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-6" @click.stop="">
-			<div class="flex justify-between items-center gap-3">
-				<p class="text-xl font-semibold">Modificar datos personales</p>
-				<button type="button" class="w-8 h-8 hover:bg-gray-200 rounded-full modal" @click.stop="closeModal('edit-profile-modal')">
-					<i class="fa-solid fa-times text-lg"></i>
-				</button>
+	<form @submit.prevent="modificarPerfil">
+		<div id="edit-profile-modal" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-30 hidden justify-center items-center z-20 modal" @click="closeAllModals">
+			<div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-6" @click.stop="">
+				<div class="flex justify-between items-center gap-3">
+					<p class="text-xl font-semibold">Modificar datos personales</p>
+					<button type="button" class="w-8 h-8 hover:bg-gray-200 rounded-full modal" @click.stop="closeModal('edit-profile-modal')">
+						<i class="fa-solid fa-times text-lg"></i>
+					</button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="flex flex-col gap-1">
+						<label for="name">Nombres </label>
+						<input type="text" id="namePerf" class="input-text" v-model="newUserInfo.nombre" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="lastname">Apellidos </label>
+						<input type="text" id="lastnamePerf" class="input-text" v-model="newUserInfo.apellido" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="email">Correo electrónico </label>
+						<input type="email" id="emailPerf" class="input-text" v-model="newUserInfo.email" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="phone">Teléfono </label>
+						<input type="tel" id="phonePerf" class="input-text" v-model="newUserInfo.telefono" pattern="^\d{10}$" title="El numero de telefono debe tener 10 digitos." required>
+					</div>
+					<div class="flex flex-col gap-1 md:col-span-2">
+						<label for="address">Domicilio </label>
+						<input type="text" id="addressPerf" class="input-text" v-model="newUserInfo.domicilio" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="password">Contraseña</label>
+						<input type="password" id="passwordPerf" class="input-text" v-model="newUserInfo.password">
+					</div>
+					<div v-if="newUserInfo.password" class="flex flex-col gap-1">
+						<label for="password-confirmation">Repetir contraseña</label>
+						<input type="password" id="password-confirmationPerf" class="input-text" v-model="newUserInfo.passwordConfirm" required>
+					</div>
+				</div>
+				<button type="submit" class="btn border-green-700 text-green-700">Guardar</button>
 			</div>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<div class="flex flex-col gap-1">
-					<label for="name">Nombres <span class="text-red-700">*</span></label>
-					<input type="text" id="namePers" class="input-text" value="John">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="lastname">Apellidos <span class="text-red-700">*</span></label>
-					<input type="text" id="lastnamePers" class="input-text" value="Doe">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="email">Correo electrónico <span class="text-red-700">*</span></label>
-					<input type="email" id="emailPers" class="input-text" value="johndoe@appleseed.com">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="phone">Teléfono <span class="text-red-700">*</span></label>
-					<input type="tel" id="phonePers" class="input-text" value="+1 517 978-1234">
-				</div>
-				<div class="flex flex-col gap-1 md:col-span-2">
-					<label for="address">Domicilio <span class="text-red-700">*</span></label>
-					<input type="text" id="addressPers" class="input-text" value="461 Robinson St, Lansing, MI">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="password">Contraseña</label>
-					<input type="password" id="passwordPers" class="input-text">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="password-confirmation">Repetir contraseña</label>
-					<input type="password" id="password-confirmationPers" class="input-text">
-				</div>
-			</div>
-			<button type="button" class="btn border-green-700 text-green-700">Guardar</button>
 		</div>
-	</div>
+	</form>
 	<div class="container mx-auto flex gap-10">
 		<div class="flex-grow flex flex-col gap-3">
 			<div class="flex justify-between items-center gap-3 px-3">
@@ -243,7 +245,48 @@ import { isAfter, subYears } from 'date-fns';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-const selectedCotitular = ref([]);;
+const selectedCotitular = ref([]);
+const newUserInfo = ref([]);
+
+
+async function modificarPerfil(){
+	if(newUserInfo.value.password !== newUserInfo.value.passwordConfirm){
+		alert('La contraseña no coincide con la confirmacion.');
+		return;
+	}
+	let userData;
+	if(newUserInfo.value.password){
+		userData = {
+			nombres: newUserInfo.value.nombre,
+			apellidos: newUserInfo.value.apellido,
+			telefono: newUserInfo.value.telefono,
+			domicilio: newUserInfo.value.domicilio,
+			//email: newUserInfo.value.email
+			contrasena: newUserInfo.value.password
+		};
+	} else {
+		userData = {
+			nombres: newUserInfo.value.nombre,
+			apellidos: newUserInfo.value.apellido,
+			telefono: newUserInfo.value.telefono,
+			domicilio: newUserInfo.value.domicilio,
+			//email: newUserInfo.value.email
+		};
+	}
+	const { data, error: errorInsertar } = await supabase
+		.from('clientes')
+		.update(userData)
+		.eq('nro_afiliado',userInfo.value.nroAfiliado)
+	if(errorInsertar){
+		alert('Hubo un error al intentar modificar los datos, verifique que todos los campos sean validos.');
+		console.error(errorInsertar);
+	}
+	else {
+		alert('Datos modificados con exito.');
+		actualizarDatosPersonales();
+		closeModal('edit-profile-modal');
+	}
+}
 
 function validarFechaNacimiento(fechaNacimiento) {
 	const fechaNacimientoDate = new Date(fechaNacimiento);
@@ -298,8 +341,10 @@ async function crearCotitular(){
 const showModal = function (id, cotitular=null){
 		if(cotitular)
 			selectedCotitular.value = cotitular;
-		else
+		else {
 			selectedCotitular.value = [];
+			newUserInfo.value = userInfo.value;
+		}
 		const modal = document.getElementById(id)
 		if(modal && modal.classList.contains('hidden')){
 			modal.classList.add('flex')
@@ -360,6 +405,25 @@ async function actualizarCotitulares(){
 		console.error(updateError);
 	} else
 		userInfo.value.cotitulares = nuevosCotitulares;
+}
+
+async function actualizarDatosPersonales(){
+	const { data: newUserData, error: updateDataError } = await supabase
+		.from('clientes')
+		.select('*')
+		.eq('nro_afiliado', userInfo.value.nroAfiliado);
+	if(updateDataError){
+		alert('Error al actualizar los cotitulares.');
+		console.error(updateDataError);
+	} else {
+		userInfo.value.nombre = newUserData[0].nombres;
+		userInfo.value.apellido = newUserData[0].apellidos;
+		userInfo.value.telefono = newUserData[0].telefono;
+		userInfo.value.domicilio = newUserData[0].domicilio;
+		userInfo.value.dni = newUserData[0].dni;
+		userInfo.value.email = newUserData[0].email;
+	}
+
 }
 </script>
 
