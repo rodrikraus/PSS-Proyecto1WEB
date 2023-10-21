@@ -59,8 +59,8 @@
 					<div class="flex flex-col gap-1">
 						<label>Sexo</label>
 						<div class="flex items-center gap-3">
-							<label><input type="radio" id="femenino" value="f" v-model="formData.sexo" required> Femenino</label>
-							<label><input type="radio" id="masculino" value="m" v-model="formData.sexo" required> Masculino</label>
+							<label><input type="radio" id="femenino" value="femenino" v-model="formData.sexo" required> Femenino</label>
+							<label><input type="radio" id="masculino" value="masculino" v-model="formData.sexo" required> Masculino</label>
 						</div>
 					</div>
 				</div>
@@ -238,6 +238,8 @@ import {showModal,closeModal,closeAllModals} from '@/helpers'
 import { userInfo } from '@/router/index.js';
 import { supabase } from '../../supabase.js';
 import { isAfter, subYears } from 'date-fns';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 
 let formData = {
@@ -248,9 +250,7 @@ let formData = {
 		fecha_nacimiento: '',
 		telefono: '',
 		domicilio: '',
-		sexo: '',
-		nro_afiliado: '',
-		plan: '',
+		sexo: ''
 	};
 
 function validarFechaNacimiento(fechaNacimiento) {
@@ -265,10 +265,47 @@ function validarFechaNacimiento(fechaNacimiento) {
 	return true;
 }
 
-function crearCotitular(){
-	closeModal('add-relative-modal');
-	validarFechaNacimiento(formData.fecha_nacimiento);
-	//chequear que los DNIs de los cotitulares sean unicos (no esten en la BD)
+async function crearCotitular(){
+	
+	if(!validarFechaNacimiento(formData.fecha_nacimiento))
+		return;
+
+	const {data: cotitulares, error: cotitularesError} = await supabase.from('cotitulares').select('dni').eq('dni',formData.dni)
+	if(cotitulares.length>0){
+		alert('El Cotitular a registrar ya existe.');
+		return;
+	} else if (cotitularesError){
+		alert('Hubo un error en la base de datos.');
+		console.error(cotitularesError);
+		return;
+	}
+
+	const cotitularData = {
+		nombre: formData.nombre,
+		apellido: formData.apellido,
+		relacion_con_titular: formData.relacion_con_titular,
+		dni: formData.dni,
+		fecha_nacimiento: formData.fecha_nacimiento,
+		telefono: formData.telefono,
+		domicilio: formData.domicilio,
+		sexo: formData.sexo,
+		nro_afiliado: userInfo.value.nroAfiliado,
+		nombre_plan: userInfo.value.plan.nombre
+	};
+	const { data, error: errorInsertar } = await supabase.from('cotitulares').insert(cotitularData);
+	if(errorInsertar){
+		alert('Hubo un error al intentar registrar al cotitular, verifique que todos los campos sean validos.');
+		console.error(errorInsertar);
+	}
+	else {
+		alert('Cotitular creado con exito.');	//Actualizamos los cotitulares
+		const { data: nuevosCotitulares } = await supabase
+			.from('cotitulares')
+			.select('*')
+			.eq('nro_afiliado', userInfo.value.nroAfiliado);
+		userInfo.value.cotitulares = nuevosCotitulares;
+		closeModal('add-relative-modal');
+	}
 }
 
 
