@@ -2,15 +2,15 @@
 	<div id="delete-relative-modal" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-30 hidden justify-center items-center z-20 modal" @click="closeAllModals">
 		<div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-6" @click.stop="">
 			<div class="flex justify-between items-center gap-3">
-				<p class="text-xl font-semibold">Eliminar cotitular «Jane Doe»</p>
+				<p class="text-xl font-semibold">Eliminar cotitular «{{ selectedCotitular.nombre }} {{ selectedCotitular.apellido }}»</p>
 				<button type="button" class="w-8 h-8 hover:bg-gray-200 rounded-full modal" @click.stop="closeModal('delete-relative-modal')">
 					<i class="fa-solid fa-times text-lg"></i>
 				</button>
 			</div>
 			<div class="flex flex-col gap-3">
-				<p>¿Está seguro que desea eliminar su cotitular «Jane Doe»? Esta acción no se puede deshacer.</p>
+				<p>¿Está seguro que desea eliminar su cotitular «{{ selectedCotitular.nombre }} {{ selectedCotitular.apellido }}»? Esta acción no se puede deshacer.</p>
 				<div class="flex justify-end">
-					<button type="button" class="btn border-red-700 text-red-700">Eliminar</button>
+					<button type="button" @click="deleteCotitular" class="btn border-red-700 text-red-700">Eliminar</button>
 				</div>
 			</div>
 		</div>
@@ -27,40 +27,40 @@
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div class="flex flex-col gap-1">
 						<label for="name">Nombres</label>
-						<input type="text" id="name" class="input-text" v-model="formData.nombre" required>
+						<input type="text" id="name" class="input-text" v-model="selectedCotitular.nombre" required>
 					</div>
 					<div class="flex flex-col gap-1">
 						<label for="lastname">Apellidos</label>
-						<input type="text" id="lastname" class="input-text" v-model="formData.apellido" required>
+						<input type="text" id="lastname" class="input-text" v-model="selectedCotitular.apellido" required>
 					</div>
 					<div class="flex flex-col gap-1">
 						<label for="relationship">Parentesco</label>
-						<select id="relationship" v-model="formData.relacion_con_titular" required>
+						<select id="relationship" v-model="selectedCotitular.relacion_con_titular" required>
 							<option value="conyuge">Cónyuge</option>
 							<option value="hijo/a">Hijo/a</option>
 						</select>
 					</div>
 					<div class="flex flex-col gap-1">
 						<label for="id_card">DNI</label>
-						<input type="tel" id="id_card" name="id_card" class="input-text" v-model="formData.dni" pattern="^\d{7,8}$" title="El DNI debe tener 7 u 8 digitos." required>
+						<input type="tel" id="id_cardCreate" class="input-text" v-model="selectedCotitular.dni" pattern="^\d{7,8}$" title="El DNI debe tener 7 u 8 digitos." required>
 					</div>
 					<div class="flex flex-col gap-1">
 						<label for="birthdate">Fecha de nacimiento</label>
-						<input type="date" id="birthdate" class="input-text" v-model="formData.fecha_nacimiento" required>
+						<input type="date" id="birthdateCreate" class="input-text" v-model="selectedCotitular.fecha_nacimiento" required>
 					</div>
 					<div class="flex flex-col gap-1">
 						<label for="phone">Teléfono</label>
-						<input type="tel" id="phone" class="input-text" v-model="formData.telefono" pattern="^\d{10}$" title="El numero de telefono debe tener 10 digitos." required>
+						<input type="tel" id="phoneCreate" class="input-text" v-model="selectedCotitular.telefono" pattern="^\d{10}$" title="El numero de telefono debe tener 10 digitos." required>
 					</div>
 					<div class="flex flex-col gap-1">
 						<label for="address">Domicilio</label>
-						<input type="text" id="address" class="input-text" v-model="formData.domicilio" required>
+						<input type="text" id="addressCreate" class="input-text" v-model="selectedCotitular.domicilio" required>
 					</div>
 					<div class="flex flex-col gap-1">
 						<label>Sexo</label>
 						<div class="flex items-center gap-3">
-							<label><input type="radio" id="femenino" value="femenino" v-model="formData.sexo" required> Femenino</label>
-							<label><input type="radio" id="masculino" value="masculino" v-model="formData.sexo" required> Masculino</label>
+							<label><input type="radio" id="femenino" value="femenino" v-model="selectedCotitular.sexo" required> Femenino</label>
+							<label><input type="radio" id="masculino" value="masculino" v-model="selectedCotitular.sexo" required> Masculino</label>
 						</div>
 					</div>
 				</div>
@@ -68,39 +68,41 @@
 			</div>
 		</div>
 	</form>
-	<div id="edit-relative-modal" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-30 hidden justify-center items-center z-20 modal" @click="closeAllModals">
-		<div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-6" @click.stop="">
-			<div class="flex justify-between items-center gap-3">
-				<p class="text-xl font-semibold">Modificar datos personales de cotitular «Jane Doe»</p>
-				<button type="button" class="w-8 h-8 hover:bg-gray-200 rounded-full modal" @click.stop="closeModal('edit-relative-modal')">
-					<i class="fa-solid fa-times text-lg"></i>
-				</button>
+	<form @submit.prevent="modificarCotitular">
+		<div id="edit-relative-modal" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-30 hidden justify-center items-center z-20 modal" @click="closeAllModals">
+			<div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-6" @click.stop="">
+				<div class="flex justify-between items-center gap-3">
+					<p class="text-xl font-semibold">Modificar datos personales de cotitular «{{ selectedCotitular.nombre }} {{ selectedCotitular.apellido }}»</p>
+					<button type="button" class="w-8 h-8 hover:bg-gray-200 rounded-full modal" @click.stop="closeModal('edit-relative-modal')">
+						<i class="fa-solid fa-times text-lg"></i>
+					</button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="flex flex-col gap-1">
+						<label for="name">Nombres</label>
+						<input type="text" id="nameEdit" class="input-text" v-model="selectedCotitular.nombre" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="lastname">Apellidos</label>
+						<input type="text" id="lastnameEdit" class="input-text" v-model="selectedCotitular.apellido" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="birthdate">Fecha de nacimiento</label>
+						<input type="date" id="birthdateEdit" class="input-text" v-model="selectedCotitular.fecha_nacimiento" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="phone">Teléfono</label>
+						<input type="tel" id="phoneEdit" class="input-text" pattern="^\d{10}$" title="El numero de telefono debe tener 10 digitos." v-model="selectedCotitular.telefono" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="address">Domicilio</label>
+						<input type="text" id="addressEdit" class="input-text" v-model="selectedCotitular.domicilio" required>
+					</div>
+				</div>
+				<button type="submit" class="btn border-green-700 text-green-700">Guardar</button>
 			</div>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<div class="flex flex-col gap-1">
-					<label for="name">Nombres</label>
-					<input type="text" id="name" class="input-text" value="Jane">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="lastname">Apellidos</label>
-					<input type="text" id="lastname" class="input-text" value="Doe">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="birthdate">Fecha de nacimiento</label>
-					<input type="date" id="birthdate" class="input-text" value="1965-08-16">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="phone">Teléfono</label>
-					<input type="tel" id="phone" class="input-text" value="+1 517 978-1234">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="address">Domicilio</label>
-					<input type="text" id="address" class="input-text" value="461 Robinson St, Lansing, MI">
-				</div>
-			</div>
-			<button type="button" class="btn border-green-700 text-green-700">Guardar</button>
 		</div>
-	</div>
+	</form>
 	<div id="edit-profile-modal" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-30 hidden justify-center items-center z-20 modal" @click="closeAllModals">
 		<div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-6" @click.stop="">
 			<div class="flex justify-between items-center gap-3">
@@ -112,31 +114,31 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<div class="flex flex-col gap-1">
 					<label for="name">Nombres <span class="text-red-700">*</span></label>
-					<input type="text" id="name" class="input-text" value="John">
+					<input type="text" id="namePers" class="input-text" value="John">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="lastname">Apellidos <span class="text-red-700">*</span></label>
-					<input type="text" id="lastname" class="input-text" value="Doe">
+					<input type="text" id="lastnamePers" class="input-text" value="Doe">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="email">Correo electrónico <span class="text-red-700">*</span></label>
-					<input type="email" id="email" class="input-text" value="johndoe@appleseed.com">
+					<input type="email" id="emailPers" class="input-text" value="johndoe@appleseed.com">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="phone">Teléfono <span class="text-red-700">*</span></label>
-					<input type="tel" id="phone" class="input-text" value="+1 517 978-1234">
+					<input type="tel" id="phonePers" class="input-text" value="+1 517 978-1234">
 				</div>
 				<div class="flex flex-col gap-1 md:col-span-2">
 					<label for="address">Domicilio <span class="text-red-700">*</span></label>
-					<input type="text" id="address" class="input-text" value="461 Robinson St, Lansing, MI">
+					<input type="text" id="addressPers" class="input-text" value="461 Robinson St, Lansing, MI">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="password">Contraseña</label>
-					<input type="password" id="password" class="input-text">
+					<input type="password" id="passwordPers" class="input-text">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="password-confirmation">Repetir contraseña</label>
-					<input type="password" id="password-confirmation" class="input-text">
+					<input type="password" id="password-confirmationPers" class="input-text">
 				</div>
 			</div>
 			<button type="button" class="btn border-green-700 text-green-700">Guardar</button>
@@ -224,8 +226,8 @@
 						<p>{{ cotitular.sexo }}</p>
 					</div>
 					<div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 md:col-span-2 xl:col-span-4">
-						<button type="button" class="btn border-blue-700 text-blue-700" @click="showModal('edit-relative-modal')">Modificar datos personales</button>
-						<button type="button" class="btn border-red-700 text-red-700" @click="showModal('delete-relative-modal')">Eliminar cotitular</button>
+						<button type="button" class="btn border-blue-700 text-blue-700" @click="showModal('edit-relative-modal', cotitular)">Modificar datos personales</button>
+						<button type="button" class="btn border-red-700 text-red-700" @click="showModal('delete-relative-modal', cotitular)">Eliminar cotitular</button>
 					</div>
 				</div>
 			</div>
@@ -234,24 +236,14 @@
 </template>
 
 <script setup>
-import {showModal,closeModal,closeAllModals} from '@/helpers'
+import {closeModal,closeAllModals} from '@/helpers'
 import { userInfo } from '@/router/index.js';
 import { supabase } from '../../supabase.js';
 import { isAfter, subYears } from 'date-fns';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-
-let formData = {
-		nombre: '',
-		apellido: '',
-		relacion_con_titular: '',
-		dni: '',
-		fecha_nacimiento: '',
-		telefono: '',
-		domicilio: '',
-		sexo: ''
-	};
+const selectedCotitular = ref([]);;
 
 function validarFechaNacimiento(fechaNacimiento) {
 	const fechaNacimientoDate = new Date(fechaNacimiento);
@@ -266,11 +258,10 @@ function validarFechaNacimiento(fechaNacimiento) {
 }
 
 async function crearCotitular(){
-	
-	if(!validarFechaNacimiento(formData.fecha_nacimiento))
+	if(!validarFechaNacimiento(selectedCotitular.value.fecha_nacimiento))
 		return;
 
-	const {data: cotitulares, error: cotitularesError} = await supabase.from('cotitulares').select('dni').eq('dni',formData.dni)
+	const {data: cotitulares, error: cotitularesError} = await supabase.from('cotitulares').select('dni').eq('dni',selectedCotitular.value.dni)
 	if(cotitulares.length>0){
 		alert('El Cotitular a registrar ya existe.');
 		return;
@@ -281,14 +272,14 @@ async function crearCotitular(){
 	}
 
 	const cotitularData = {
-		nombre: formData.nombre,
-		apellido: formData.apellido,
-		relacion_con_titular: formData.relacion_con_titular,
-		dni: formData.dni,
-		fecha_nacimiento: formData.fecha_nacimiento,
-		telefono: formData.telefono,
-		domicilio: formData.domicilio,
-		sexo: formData.sexo,
+		nombre: selectedCotitular.value.nombre,
+		apellido: selectedCotitular.value.apellido,
+		relacion_con_titular: selectedCotitular.value.relacion_con_titular,
+		dni: selectedCotitular.value.dni,
+		fecha_nacimiento: selectedCotitular.value.fecha_nacimiento,
+		telefono: selectedCotitular.value.telefono,
+		domicilio: selectedCotitular.value.domicilio,
+		sexo: selectedCotitular.value.sexo,
 		nro_afiliado: userInfo.value.nroAfiliado,
 		nombre_plan: userInfo.value.plan.nombre
 	};
@@ -298,16 +289,77 @@ async function crearCotitular(){
 		console.error(errorInsertar);
 	}
 	else {
-		alert('Cotitular creado con exito.');	//Actualizamos los cotitulares
-		const { data: nuevosCotitulares } = await supabase
-			.from('cotitulares')
-			.select('*')
-			.eq('nro_afiliado', userInfo.value.nroAfiliado);
-		userInfo.value.cotitulares = nuevosCotitulares;
+		alert('Cotitular creado con exito.');
+		actualizarCotitulares();
 		closeModal('add-relative-modal');
 	}
 }
 
+const showModal = function (id, cotitular=null){
+		if(cotitular)
+			selectedCotitular.value = cotitular;
+		else
+			selectedCotitular.value = [];
+		const modal = document.getElementById(id)
+		if(modal && modal.classList.contains('hidden')){
+			modal.classList.add('flex')
+			modal.classList.remove('hidden')
+		}
+	}
 
+async function deleteCotitular(){
+	if(selectedCotitular){
+		const { data, error: deleteError} = await supabase
+			.from('cotitulares')
+			.delete()
+			.eq('dni', selectedCotitular.value.dni);
+		if(deleteError){
+			alert('Hubo un error al intentar eliminar al cotitular.');
+			console.error(deleteError);
+		} else {
+			alert('Cotitular eliminado correctamente');
+			actualizarCotitulares();
+		}
+	}
+	closeModal('delete-relative-modal');
+}
+
+async function modificarCotitular(){
+	if(!validarFechaNacimiento(selectedCotitular.value.fecha_nacimiento))
+		return;
+
+	const cotitularData = {
+		nombre: selectedCotitular.value.nombre,
+		apellido: selectedCotitular.value.apellido,
+		fecha_nacimiento: selectedCotitular.value.fecha_nacimiento,
+		telefono: selectedCotitular.value.telefono,
+		domicilio: selectedCotitular.value.domicilio
+	};
+	const { data, error: errorInsertar } = await supabase
+		.from('cotitulares')
+		.update(cotitularData)
+		.eq('dni',selectedCotitular.value.dni)
+	if(errorInsertar){
+		alert('Hubo un error al intentar modificar al cotitular, verifique que todos los campos sean validos.');
+		console.error(errorInsertar);
+	}
+	else {
+		alert('Cotitular modificado con exito.');
+		actualizarCotitulares();
+		closeModal('edit-relative-modal');
+	}
+}
+
+async function actualizarCotitulares(){
+	const { data: nuevosCotitulares, error: updateError } = await supabase
+		.from('cotitulares')
+		.select('*')
+		.eq('nro_afiliado', userInfo.value.nroAfiliado);
+	if(updateError){
+		alert('Error al actualizar los cotitulares.');
+		console.error(updateError);
+	} else
+		userInfo.value.cotitulares = nuevosCotitulares;
+}
 </script>
 
