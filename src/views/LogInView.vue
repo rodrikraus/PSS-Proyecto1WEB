@@ -85,8 +85,14 @@
 					"nroAfiliado":userData[0].nro_afiliado,
 					"plan":{
 						"nombre":userData[0].nombre_plan,
-						"vencimiento":"20/10/23"			//Ver de agregar vencimiento o calcularlo?
+						"vencimiento":"20/10/23"
 					},
+					"sexo":userData[0].sexo,
+					"fecha_nacimiento":userData[0].fecha_nacimiento,
+					"telefono":userData[0].telefono,
+					"domicilio":userData[0].domicilio,
+					"dni":userData[0].dni,
+					"email":userData[0].email,
 					"cotitulares": userData[0].cotitulares
 				}
 			} else {

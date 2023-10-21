@@ -14,7 +14,7 @@
 		  <RouterLink v-if="(isClientLoggedIn || isEmployeeLoggedIn) && !isAdminLoggedIn" :to="{ name: 'profile' }">Mi Perfil</RouterLink>
 		  <!--<RouterLink :to="{name: 'employees'}">Empleados</RouterLink>-->
 		  <!--<RouterLink :to="{name: 'profile'}">Mi Perfil</RouterLink>-->
-		  <RouterLink :to="{name: 'profile.employee'}">Mi Perfil</RouterLink>
+		  <RouterLink v-if="isEmployeeLoggedIn" :to="{name: 'profile.employee'}">Mi Perfil</RouterLink>
 		  <a v-if="isClientLoggedIn || isAdminLoggedIn || isEmployeeLoggedIn" @click="logout" href="#">Salir</a>
 		</nav>
 	  </div>
