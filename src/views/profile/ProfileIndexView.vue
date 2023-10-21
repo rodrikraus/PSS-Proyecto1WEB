@@ -413,7 +413,7 @@ async function actualizarDatosPersonales(){
 		.select('*')
 		.eq('nro_afiliado', userInfo.value.nroAfiliado);
 	if(updateDataError){
-		alert('Error al actualizar los cotitulares.');
+		alert('Error al actualizar los datos personales.');
 		console.error(updateDataError);
 	} else {
 		userInfo.value.nombre = newUserData[0].nombres;
