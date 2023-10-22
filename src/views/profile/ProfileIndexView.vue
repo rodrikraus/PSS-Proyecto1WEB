@@ -57,6 +57,10 @@
 						<input type="text" id="addressCreate" class="input-text" v-model="selectedCotitular.domicilio" required>
 					</div>
 					<div class="flex flex-col gap-1">
+						<label for="email">E-mail</label>
+						<input type="email" id="emailCreate" class="input-text" v-model="selectedCotitular.email" required>
+					</div>
+					<div class="flex flex-col gap-1">
 						<label>Sexo</label>
 						<div class="flex items-center gap-3">
 							<label><input type="radio" id="femenino" value="femenino" v-model="selectedCotitular.sexo" required> Femenino</label>
@@ -97,6 +101,10 @@
 					<div class="flex flex-col gap-1">
 						<label for="address">Domicilio</label>
 						<input type="text" id="addressEdit" class="input-text" v-model="selectedCotitular.domicilio" required>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="email">E-mail</label>
+						<input type="email" id="emailEdit" class="input-text" v-model="selectedCotitular.email" required>
 					</div>
 				</div>
 				<button type="submit" class="btn border-green-700 text-green-700">Guardar</button>
@@ -227,6 +235,10 @@
 						<label>Sexo</label>
 						<p>{{ cotitular.sexo }}</p>
 					</div>
+					<div class="flex flex-col gap-1">
+						<label>E-mail</label>
+						<p>{{ cotitular.email }}</p>
+					</div>
 					<div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 md:col-span-2 xl:col-span-4">
 						<button type="button" class="btn border-blue-700 text-blue-700" @click="showModal('edit-relative-modal', cotitular)">Modificar datos personales</button>
 						<button type="button" class="btn border-red-700 text-red-700" @click="showModal('delete-relative-modal', cotitular)">Eliminar cotitular</button>
@@ -261,8 +273,8 @@ async function modificarPerfil(){
 			apellidos: newUserInfo.value.apellido,
 			telefono: newUserInfo.value.telefono,
 			domicilio: newUserInfo.value.domicilio,
-			//email: newUserInfo.value.email
-			contrasena: newUserInfo.value.password
+			email: newUserInfo.value.email,
+			contrasena: newUserInfo.value.password,
 		};
 	} else {
 		userData = {
@@ -270,7 +282,7 @@ async function modificarPerfil(){
 			apellidos: newUserInfo.value.apellido,
 			telefono: newUserInfo.value.telefono,
 			domicilio: newUserInfo.value.domicilio,
-			//email: newUserInfo.value.email
+			email: newUserInfo.value.email,
 		};
 	}
 	const { data, error: errorInsertar } = await supabase
@@ -323,6 +335,7 @@ async function crearCotitular(){
 		telefono: selectedCotitular.value.telefono,
 		domicilio: selectedCotitular.value.domicilio,
 		sexo: selectedCotitular.value.sexo,
+		email: selectedCotitular.value.email,
 		nro_afiliado: userInfo.value.nroAfiliado,
 		nombre_plan: userInfo.value.plan.nombre
 	};
@@ -378,7 +391,8 @@ async function modificarCotitular(){
 		apellido: selectedCotitular.value.apellido,
 		fecha_nacimiento: selectedCotitular.value.fecha_nacimiento,
 		telefono: selectedCotitular.value.telefono,
-		domicilio: selectedCotitular.value.domicilio
+		domicilio: selectedCotitular.value.domicilio,
+		email: selectedCotitular.value.email,
 	};
 	const { data, error: errorInsertar } = await supabase
 		.from('cotitulares')
