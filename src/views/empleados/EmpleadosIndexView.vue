@@ -10,34 +10,34 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<div class="flex flex-col gap-1">
 					<label for="name">Nombres</label>
-					<input type="text" id="name" class="input-text">
+					<input type="text" v-model="names" id="name" class="input-text">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="lastname">Apellidos</label>
-					<input type="text" id="lastname" class="input-text">
+					<input type="text" id="lastname" v-model="lastnames" class="input-text">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="email">Correo electrónico</label>
-					<input type="email" id="email" class="input-text">
+					<input type="email" id="email" v-model="email" class="input-text">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="phone">Teléfono</label>
-					<input type="tel" id="phone" class="input-text">
+					<input type="tel" id="phone" v-model="phone" class="input-text">
 				</div>
 				<div class="flex flex-col gap-1 md:col-span-2">
 					<label for="address">Domicilio</label>
-					<input type="text" id="address" class="input-text">
+					<input type="text" id="address" v-model="address" class="input-text">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="password">Contraseña</label>
-					<input type="password" id="password" class="input-text">
+					<input type="password" id="password" v-model="password" class="input-text">
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="password-confirmation">Repetir contraseña</label>
 					<input type="password" id="password-confirmation" class="input-text">
 				</div>
 			</div>
-			<button type="button" class="btn border-green-700 text-green-700">Guardar</button>
+			<button type="button" class="btn border-green-700 text-green-700" @click="closeModal('add-employee-modal'); createEmployee()">Guardar</button>
 		</div>
 	</div>
 	<div class="container mx-auto flex gap-10">
@@ -60,4 +60,27 @@
 
 <script setup>
 import {showModal,closeModal,closeAllModals} from '@/helpers'
+import { supabase } from '../../supabase';
+import { ref } from 'vue';
+
+const names = ref('');
+const lastnames = ref('');
+const email = ref('');
+const phone = ref('');
+const address = ref('');
+const password = ref('');
+
+
+const createEmployee = async () => {
+	console.log("name: " + names.value + "\nlastnames: " + lastnames.value + "\nemail: " + email.value + "\nphone: " + phone.value + "\naddress: " + address.value + "\npassword: " + password.value);
+	const {error} = await supabase
+		.from('empleados')
+		.insert({
+			email: email.value,
+			contrasena: password.value,
+			nombre: names.value,
+			apellido: lastnames.value
+		});
+}
+
 </script>
