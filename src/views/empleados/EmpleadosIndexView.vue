@@ -34,10 +34,15 @@
 				</div>
 				<div class="flex flex-col gap-1">
 					<label for="password-confirmation">Repetir contraseña</label>
-					<input type="password" id="password-confirmation" class="input-text">
+					<input type="password" id="password-confirmation" v-model="passwordConfirmation" class="input-text">
 				</div>
 			</div>
-			<button type="button" class="btn border-green-700 text-green-700" @click="closeModal('add-employee-modal'); createEmployee()">Guardar</button>
+			<div v-if="validationMessage" :class="'text-red-700'">
+				<div v-html="validationMessage"></div>
+			</div>
+			<button type="button" class="btn border-green-700 text-green-700" @click="validateAndSave">
+				Guardar
+			</button>
 		</div>
 	</div>
 	<div class="container mx-auto flex gap-10">
@@ -69,10 +74,58 @@ const email = ref('');
 const phone = ref('');
 const address = ref('');
 const password = ref('');
+const passwordConfirmation = ref('');
 
+const validationMessage = ref('');
+const isValid = ref(false);
+
+function validateAndSave(){
+	validateData();
+
+	if(isValid.value){
+		createEmployee();
+		closeModal('add-employee-modal');
+		eraseProperties();
+	}
+}
+
+function validateData(){
+	isValid.value = names.value.length > 0 && lastnames.value.length > 0
+		&& /^[^@]+@\w+(\.\w+)+\w$/.test(email.value) && phone.value.length > 0
+		&& phone.value.match(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im) 
+		&& address.value.length > 0 
+		&& password.value.length > 0
+		&& password.value.valueOf() == passwordConfirmation.value.valueOf();
+
+	if(!isValid.value){
+		validationMessage.value = "<section>Credenciales inválidas: <lu>";
+
+		if(names.value.length == 0){
+			validationMessage.value += "<li>El campo 'Nombres' no puede ser vacío</li>";
+		}
+		if(lastnames.value.length == 0){
+			validationMessage.value += "<li>El campo 'Apellidos' no puede ser vacío</li>";
+		}
+		if(!email.value.match(/^[^@]+@\w+(\.\w+)+\w$/)){
+			validationMessage.value += "<li>El mail es inválido</li>";
+		}
+		if(!phone.value.match(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im)){
+			validationMessage.value += "<li>Formato de número telefónico inválido</li>";
+		}
+		if(address.value.length == 0){
+			validationMessage.value += "<li>El campo 'Domicilio' no puede ser vacío</li>";
+		}
+		if(password.value.length == 0){
+			validationMessage.value += "<li>La contraseña no puede ser vacía</li>"
+		}
+		if(password.value.valueOf() != passwordConfirmation.value.valueOf()){
+			validationMessage.value += "<li>Las contraseñas no coinciden</li>"
+		}
+		validationMessage.value += "</lu></section>";
+	}
+}
 
 const createEmployee = async () => {
-	console.log("name: " + names.value + "\nlastnames: " + lastnames.value + "\nemail: " + email.value + "\nphone: " + phone.value + "\naddress: " + address.value + "\npassword: " + password.value);
 	const {error} = await supabase
 		.from('empleados')
 		.insert({
@@ -81,6 +134,16 @@ const createEmployee = async () => {
 			nombre: names.value,
 			apellido: lastnames.value
 		});
+}
+
+function eraseProperties(){
+	names.value = '';
+	lastnames.value = '';
+	email.value = '';
+	phone.value = '';
+	address.value = '';
+	password.value = '';
+	passwordConfirmation.value = '';
 }
 
 </script>
