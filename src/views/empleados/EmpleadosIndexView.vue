@@ -52,11 +52,8 @@
 				<button type="button" class="btn border-green-700 text-green-700" @click="showModal('add-employee-modal')">Agregar</button>
 			</div>
 			<div class="flex flex-col divide-y">
-				<div class="flex items-center gap-3 px-3 py-2">
-					<p class="flex-grow font-semibold text-lg">Jack Deer</p>
-				</div>
-				<div class="flex items-center gap-3 px-3 py-2">
-					<p class="flex-grow font-semibold text-lg">Joshua Buck</p>
+				<div v-for="empl in employees" :key="empl.id_empleados" class="flex items-center gap-3 px-3 py-2">
+					<p class="flex-grow font-semibold text-lg">{{ empl.nombre }} {{ empl.apellido }}</p>
 				</div>
 			</div>
 		</div>
@@ -66,8 +63,14 @@
 <script setup>
 import {showModal,closeModal,closeAllModals} from '@/helpers'
 import { supabase } from '../../supabase';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
+onMounted(() => {
+	getEmployees();
+})
+
+const WAIT_TIME = 5000;
+const employees = ref([]);
 const names = ref('');
 const lastnames = ref('');
 const email = ref('');
@@ -79,13 +82,17 @@ const passwordConfirmation = ref('');
 const validationMessage = ref('');
 const isValid = ref(false);
 
-function validateAndSave(){
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
+async function validateAndSave(){
 	validateData();
 
 	if(isValid.value){
 		createEmployee();
 		closeModal('add-employee-modal');
 		eraseProperties();
+		await delay(WAIT_TIME); // necesario, sino no muestra el empleado recién cargado
+		getEmployees();
 	}
 }
 
@@ -126,7 +133,7 @@ function validateData(){
 }
 
 const createEmployee = async () => {
-	const {error} = await supabase
+	const {} = await supabase
 		.from('empleados')
 		.insert({
 			email: email.value,
@@ -134,6 +141,14 @@ const createEmployee = async () => {
 			nombre: names.value,
 			apellido: lastnames.value
 		});
+}
+
+async function getEmployees() {
+	const {data} = await supabase
+		.from('empleados')
+		.select(`id_empleados, nombre, apellido`);
+	
+	employees.value = data;
 }
 
 function eraseProperties(){
