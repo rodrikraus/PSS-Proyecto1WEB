@@ -73,7 +73,7 @@
 			//busco en la tabla de clientes
 			const { data: userData } = await supabase
 			.from('clientes')
-			.select('*, cotitulares (*)')
+			.select('*, cotitulares (*), solicitudes_reintegros(*), solicitudes_prestaciones(*)')
 			.eq('email', email.value)
 			.eq('contrasena', password.value);
 			if (userData.length > 0) {
@@ -93,7 +93,9 @@
 					"domicilio":userData[0].domicilio,
 					"dni":userData[0].dni,
 					"email":userData[0].email,
-					"cotitulares": userData[0].cotitulares
+					"cotitulares": userData[0].cotitulares,
+					"reintegros": userData[0].solicitudes_reintegros,
+					"prestaciones": userData[0].solicitudes_prestaciones,
 				}
 			} else {
 				authMessage.value = 'Credenciales incorrectas';
