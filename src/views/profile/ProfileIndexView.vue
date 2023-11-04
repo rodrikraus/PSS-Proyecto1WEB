@@ -253,7 +253,7 @@
 import {closeModal,closeAllModals} from '@/helpers'
 import { userInfo } from '@/router/index.js';
 import { supabase } from '../../supabase.js';
-import { isAfter, subYears } from 'date-fns';
+import { isAfter, isBefore, subYears } from 'date-fns';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -301,11 +301,11 @@ async function modificarPerfil(){
 }
 
 function validarFechaNacimiento(fechaNacimiento) {
-	const fechaNacimientoDate = new Date(fechaNacimiento);
-	const fechaHace18Anios = subYears(new Date(), 18);
+	const fechaElegida = new Date(fechaNacimiento);
+	const fechaHoy = new Date();
 
-	if (isAfter(fechaNacimientoDate, fechaHace18Anios)) {
-		alert('El cotitular debe tener mas de 18 años.');
+	if (isBefore(fechaElegida, fechaHoy)) {
+		alert('La fecha de nacimiento del cotitular debe ser anterior a hoy.');
 		return false;
 	}
 

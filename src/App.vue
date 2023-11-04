@@ -11,7 +11,7 @@
 		  <RouterLink v-if="isClientLoggedIn" :to="{ name: 'plansInfo' }">Planes</RouterLink>
 		  <RouterLink v-if="isAdminLoggedIn" :to="{ name: 'plans' }">Planes</RouterLink>
 		  <RouterLink v-if="isAdminLoggedIn" :to="{ name: 'empleados' }">Empleados</RouterLink>
-		  <RouterLink v-if="(isClientLoggedIn || isEmployeeLoggedIn) && !isAdminLoggedIn" :to="{ name: 'profile' }">Mi Perfil</RouterLink>
+		  <RouterLink v-if="isClientLoggedIn" :to="{ name: 'profile' }">Mi Perfil</RouterLink>
 		  <!--<RouterLink :to="{name: 'employees'}">Empleados</RouterLink>-->
 		  <!--<RouterLink :to="{name: 'profile'}">Mi Perfil</RouterLink>-->
 		  <RouterLink v-if="isEmployeeLoggedIn" :to="{name: 'profile.employee'}">Mi Perfil</RouterLink>
