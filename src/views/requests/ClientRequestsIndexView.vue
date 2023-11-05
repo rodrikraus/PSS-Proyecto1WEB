@@ -49,40 +49,40 @@
 			</div>
 		</div>
 	</div>
-	<div id="request-reimbursement-modal" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-30 hidden justify-center items-center z-20 modal" @click="closeAllModals">
-		<div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-6" @click.stop="">
-			<div class="flex justify-between items-center gap-3">
-				<p class="text-xl font-semibold">Solicitar aprobación de un reintegro</p>
-				<button type="button" class="w-8 h-8 hover:bg-gray-200 rounded-full" @click.stop="closeModal('request-reimbursement-modal')">
-					<i class="fa-solid fa-times text-lg"></i>
-				</button>
-			</div>
-			<div class="flex flex-col gap-3">
-				<div class="flex flex-col gap-1">
-					<label for="affiliate">Afiliado solicitante</label>
-					<select id="affiliate">
-						<option value="1">John Doe</option>
-						<option value="2">Jane Doe</option>
-						<option value="3">Joanne Doe</option>
-						<option value="4">Joe Doe</option>
-					</select>
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="venue">Lugar de compra</label>
-					<input type="text" id="venue" class="input-text">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="amount">Monto a reintegrar</label>
-					<input type="number" id="amount" class="input-text">
-				</div>
-				<div class="flex flex-col gap-1">
-					<label for="invoice">Factura de la compra (JPEG, PNG, PDF)</label>
-					<input type="file" id="invoice" accept="image/png,image/jpeg,application/pdf" class="file:px-3 file:py-1 file:border file:rounded file:border-blue-700 file:text-blue-700 file:bg-transparent">
-				</div>
-				<button type="button" class="btn border-green-700 text-green-700">Solicitar</button>
-			</div>
-		</div>
-	</div>
+    <form @submit.prevent="crearSolicitudReintegro">
+        <div id="request-reimbursement-modal" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-30 hidden justify-center items-center z-20 modal" @click="closeAllModals">
+            <div class="max-w-7xl rounded-lg bg-gray-100 p-10 flex flex-col gap-6" @click.stop="">
+                <div class="flex justify-between items-center gap-3">
+                    <p class="text-xl font-semibold">Solicitar aprobación de un reintegro</p>
+                    <button type="button" class="w-8 h-8 hover:bg-gray-200 rounded-full" @click.stop="closeModal('request-reimbursement-modal')">
+                        <i class="fa-solid fa-times text-lg"></i>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label for="affiliate">Afiliado solicitante</label>
+                        <select id="affiliate" v-model="newReintegroInfo.id">
+                            <option value="" >{{ userInfo.nombre }} {{ userInfo.apellido }}</option>
+                            <option v-for="cotitular in userInfo.cotitulares" :value="cotitular.id_cotitular" >{{ cotitular.nombre }} {{ cotitular.apellido }}</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label for="venue">Lugar de compra</label>
+                        <input type="text" id="venue" class="input-text" v-model="newReintegroInfo.lugar" required>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label for="amount">Monto a reintegrar</label>
+                        <input type="number" id="amount" class="input-text" min="0" v-model="newReintegroInfo.monto" required>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label for="invoice">Factura de la compra (JPEG, PNG, PDF)</label>
+                        <input type="file" id="invoice" accept="image/png,image/jpeg,application/pdf" class="file:px-3 file:py-1 file:border file:rounded file:border-blue-700 file:text-blue-700 file:bg-transparent">
+                    </div>
+                    <button type="submit" class="btn border-green-700 text-green-700">Solicitar</button>
+                </div>
+            </div>
+        </div>
+    </form>
 	<div class="container mx-auto flex gap-10">
 		<div class="flex-grow flex flex-col gap-3">
 			<div class="flex justify-between items-center gap-3 px-3">
@@ -120,10 +120,51 @@
 <script setup>
 import {showModal,closeModal,closeAllModals} from '@/helpers';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { userInfo } from '@/router/index.js';
 import { supabase } from '../../supabase.js';
 
+const newReintegroInfo = ref([]);
 
+async function crearSolicitudReintegro(){
+   
+    let reintegroData;
+    if(newReintegroInfo.value.id){
+        reintegroData = {
+            cliente: userInfo.value.nroAfiliado,
+            cotitular: newReintegroInfo.value.id,
+            lugar: newReintegroInfo.value.lugar,
+            monto: newReintegroInfo.value.monto,
+        };
+    } else {
+        reintegroData = {
+            cliente: userInfo.value.nroAfiliado,
+            cotitular: null,
+            lugar: newReintegroInfo.value.lugar,
+            monto: newReintegroInfo.value.monto,
+        };
+    }
+    const { data, error: errorInsertarReintegro } = await supabase.from('solicitudes_reintegros').insert(reintegroData);
+    if(errorInsertarReintegro){
+        alert('Hubo un error al crear la solicitud de reintegro, verifique que todos los campos sean validos.');
+        console.error(errorInsertarReintegro);
+    } else {
+        alert('Solicitud de reintegro creada con exito.');
+        newReintegroInfo.value = [];
+        actualizarSolicitudesReintegro();
+        closeModal('request-reimbursement-modal');
+    }
+}
+
+async function actualizarSolicitudesReintegro(){
+    const { data: nuevasSolicitudesReintegros, error: updateReintegrosError } = await supabase
+		.from('solicitudes_reintegros')
+		.select('*')
+		.eq('cliente', userInfo.value.nroAfiliado);
+	if(updateReintegrosError){
+		alert('Error al actualizar las solicitudes de reintegro.');
+		console.error(updateReintegrosError);
+	} else
+		userInfo.value.reintegros = nuevasSolicitudesReintegros;
+}
 
 </script>
