@@ -14,6 +14,7 @@ import HomeDefaultView from '../views/home/HomeDefaultView.vue'
 import ServicesIndexView from '../views/services/ServicesIndexView.vue'
 import EmployeeProfileIndexView from '@/views/profile/EmployeeProfileIndexView.vue'
 import ClientRequestsIndexView from '@/views/requests/ClientRequestsIndexView.vue'
+import EmployeeRequestsIndexView from '@/views/requests/EmployeeRequestsIndexView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,6 +73,11 @@ const router = createRouter({
             path: '/requests',
             name: 'requests',
             component: ClientRequestsIndexView
+        },
+        {
+            path: '/requests/employee',
+            name: 'requests.employee',
+            component: EmployeeRequestsIndexView
         },
         {
             path: '/services',

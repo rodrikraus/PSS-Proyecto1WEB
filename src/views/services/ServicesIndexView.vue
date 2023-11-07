@@ -6,7 +6,12 @@
 	<DeleteServiceModal :selectedPrestacion="selectedPrestacion" :showSuccessAlert="showSuccessAlert" :showErrorAlert="showErrorAlert"
 		@close="closeModal" @delete="deletePrestacion" />
 
-		<div class="container mx-auto flex gap-10">
+		<div v-if="loading" class="skeleton-container">
+			<div class="skeleton"></div>
+			<div class="skeleton"></div>
+			<div class="skeleton"></div>
+    	</div>
+		<div v-else class="container mx-auto flex gap-10">
 		<div class="flex-grow flex flex-col gap-3">
 			<div class="flex justify-between items-center gap-3 px-3">
 				<p class="text-blue-800 text-3xl">Prestaciones</p>
@@ -33,6 +38,8 @@ import { supabase } from '../../supabase.js';
 import EditServiceModal from './EditServiceModal.vue';
 import AddServiceModal from './AddServiceModal.vue';
 import DeleteServiceModal from './DeleteServiceModal.vue';
+
+const loading = ref(true);
 
 const prestaciones= ref([]);
 const selectedPrestacion = ref([]);
@@ -215,8 +222,9 @@ const closeModal = function (id) {
 	showFormatErrorAlert.value = false;
 };
 
-onBeforeMount(() => {
-	fetchPrestaciones();
+onBeforeMount(async() => {
+	await fetchPrestaciones();
+	loading.value = false;
 });
 
 </script>

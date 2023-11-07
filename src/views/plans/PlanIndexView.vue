@@ -5,8 +5,13 @@
 		@close="closeModal" @save="addPlan" />
 	<DeletePlanModal :selectedPlan="selectedPlan" :showSuccessAlert="showSuccessAlert" :showErrorAlert="showErrorAlert"
 		@close="closeModal" @delete="deletePlan" />
-
-	<div class="container mx-auto flex gap-10">
+	
+	<div v-if="loading" class="skeleton-container">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+	<div v-else class="container mx-auto flex gap-10">
 		<div class="flex-grow flex flex-col gap-3">
 			<div class="flex justify-between items-center gap-3 px-3">
 				<p class="text-blue-800 text-3xl">Planes</p>
@@ -36,6 +41,7 @@ import EditPlanModal from './EditPlanModal.vue';
 import AddPlanModal from './AddPlanModal.vue';
 import DeletePlanModal from './DeletePlanModal.vue';
 
+const loading = ref(true);
 const plans = ref([]);
 const selectedPlan = ref([]);
 
@@ -242,9 +248,10 @@ const closeAllModals = function () {
 	showErrorAlert.value = false;
 };
 
-onBeforeMount(() => {
-	fetchPlans();
-	fetchPrestaciones();
+onBeforeMount(async() => {
+	await fetchPlans();
+	await fetchPrestaciones();
+	loading.value = false;
 });
 
 </script>

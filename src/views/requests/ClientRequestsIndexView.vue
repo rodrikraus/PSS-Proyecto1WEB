@@ -108,8 +108,8 @@
 				<div class="flex items-center gap-3 px-3 py-2">
 					<div class="flex-grow flex flex-col">
 						<p class="font-semibold text-lg">{{ prestacion.nombre_prestacion }}</p>
-						<p class="text-gray-400 italic text-sm" v-if="prestacion.cotitular">$ {{ prestacion.medico }} · <span v-for="cotitular in userInfo.cotitulares"><span v-if="cotitular.id_cotitular == prestacion.cotitular">{{ cotitular.nombre }} {{ cotitular.apellido }}</span></span></p>
-                        <p class="text-gray-400 italic text-sm" v-else>$ {{ prestacion.medico }} · {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
+						<p class="text-gray-400 italic text-sm" v-if="prestacion.cotitular">{{ prestacion.medico }} · <span v-for="cotitular in userInfo.cotitulares"><span v-if="cotitular.id_cotitular == prestacion.cotitular">{{ cotitular.nombre }} {{ cotitular.apellido }}</span></span></p>
+                        <p class="text-gray-400 italic text-sm" v-else>{{ prestacion.medico }} · {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
 					</div>
 				</div>
 			</div>
