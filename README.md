@@ -1,5 +1,22 @@
 # OSPIFAK
 
+Partially implemented frontend project for the fictional health insurance company "OSPIFAK", where clients can manage their health insurance plans, and admins can manage these plans and their respective prices.
+
+Initial view of all the plans (admin view)
+![](/src/screenshots/screen1.png)
+
+Editing plan screen
+![](/src/screenshots/screen2.png)
+
+Client visualizing a reimbursement
+![](/src/screenshots/screen3.png)
+
+
+
+
+
+---
+
 This project runs on the Bun or Node.js runtime environment and features Vue.js, Vite, and Tailwind CSS with JavaScript (not TypeScript) for simplicity.
 
 ## Bun
